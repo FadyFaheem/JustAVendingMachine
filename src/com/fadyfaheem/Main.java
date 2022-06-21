@@ -71,8 +71,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         guiSetup();
         connectBillAcceptor();
         connectToArd();
-        addDollarBill();
-        addDollarBill();
     }
 
     public void connectToArd(){
