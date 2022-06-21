@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jPyramidRS-232-1.2.7">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/com/fadyfaheem/jPyramidRS-232-1.2.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
