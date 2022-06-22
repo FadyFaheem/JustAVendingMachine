@@ -17,16 +17,17 @@ import java.util.ArrayList;
 
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
+
     private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel;
     private JButton aButton, bButton, cButton, dButton,
             eButton, numOneButton, numTwoButton,
             numThreeButton, numFourButton, numFiveButton,
             numSixButton, numSevenButton, numEightButton,
             numNineButton, clearButton, vendButton;
-    private int dollarAvailable = 0;
-    private boolean letterAdded = false;
+    private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
+    private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
-    private final String[][] optionsAvailableArray = new String[][]
+    private final String[][] optionsAvailableArray = new String[][] // This lists the avaliable rows and selection for relay
             {{"A1", "2"},
                     {"A2", "2"},
                     {"A3", "2"},
@@ -68,33 +69,32 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     static SerialPort ardAccess;
 
     public Main() {
-        guiSetup();
-        connectBillAcceptor();
-        connectToArd();
+        guiSetup(); // Sets up GUI
+        //connectBillAcceptor(); // Initiates bill acceptor // Disabled when not in use
+        connectToArd(); // Creates connection to arduino
     }
 
     public void connectToArd(){
-        SerialPort[] portNames = SerialPort.getCommPorts();
-        ArrayList<String> ports = new ArrayList<>();
-        for (SerialPort port : portNames) {
+        SerialPort[] portNames = SerialPort.getCommPorts(); // Gets all serial ports available
+        ArrayList<String> ports = new ArrayList<>(); // array to store port non descriptive port names
+        for (SerialPort port : portNames) { // Takes all ports and parses them into Arraylist String
             ports.add(port.getSystemPortName());
         }
-        for (String port : ports) {
+        for (String port : ports) { // This gets a little messy. Takes all ports against serial port descriptive name and looks for Arduino specfic port.
+            // I have no clue if this will work or not. however I do hope so It does.
             for (SerialPort serPort: portNames) {
                 if (serPort.getDescriptivePortName().equals("Arduino Mega 2560 ("+ port + ")")){
                     ardAccess = SerialPort.getCommPort(port);
                     ardAccess.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
                     if (ardAccess.openPort()) {
                         System.out.println("Connected to arduino!");
-                    } else {
-                        System.out.println("Failed to Connect");
                     }
                 }
             }
         }
     }
 
-    public void arduinoWrite(String a){
+    public void arduinoWrite(String a){ // Writes to arduino code. Arduino takes number and proceeds to hold relay open for 2sec
         try{Thread.sleep(5);} catch(Exception ignored){}
         PrintWriter send = new PrintWriter(ardAccess.getOutputStream());
         send.print(a);
