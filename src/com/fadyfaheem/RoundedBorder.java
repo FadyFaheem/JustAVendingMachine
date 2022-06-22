@@ -7,7 +7,7 @@ import java.awt.geom.RoundRectangle2D;
 
 class RoundedBorder extends LineBorder {
 
-    private int radius;
+    private final int radius;
     RoundedBorder(Color c, int thickness, int radius) {
         super(c, thickness, true);
         this.radius = radius;

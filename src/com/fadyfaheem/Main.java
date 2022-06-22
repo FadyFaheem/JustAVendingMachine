@@ -77,7 +77,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         SerialPort[] portNames = SerialPort.getCommPorts();
         ArrayList<String> ports = new ArrayList<>();
         for (SerialPort port : portNames) {
-            System.out.println(port.getDescriptivePortName());
             ports.add(port.getSystemPortName());
         }
         for (String port : ports) {
@@ -131,11 +130,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE); //actually end the program when clicking the close button
         setTitle("Vending Machine");//text for the window's title bar
         setResizable(true);//don't allow the user to resize the window
-        setSize(1080,1920);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
+        setSize(540,960);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
 
         // TOP BAR
 
         moneyCounterLabel = GUI.labelSetup("$0", 100, 200,75,200,200,true);
+
         mainWindow.add(moneyCounterLabel);
 
         selectLabel = GUI.labelSetup("", 100, 650, 75,200,200,true);
@@ -302,7 +302,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public static void main(String[] args) {
         Main bob = new Main();
         bob.setVisible(true);
-        showOnScreen(1, bob);
     }
 
 
