@@ -31,7 +31,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         addDollarBill();
-        MySQL.removeBoughtItem("A1");
     }
 
 
@@ -289,9 +288,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         if (e.getSource() == vendButton) {
             if (selectionString.length() == 2) {
                 if (selectLabel.getForeground() == Color.white) {
-
-                    if (dollarAvailable >= 1) {
-                        dollarAvailable--;
+                int costOfItem = MySQL.costOfItem(selectionString);
+                    if (dollarAvailable >= costOfItem) {
+                        dollarAvailable -= costOfItem;
                         moneyCounterLabel.setText("$" + dollarAvailable);
                         MySQL.activateMotorForRow(selectionString);
                         MySQL.removeBoughtItem(selectionString);
