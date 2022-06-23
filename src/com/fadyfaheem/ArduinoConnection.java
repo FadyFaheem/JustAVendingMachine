@@ -29,10 +29,18 @@ public class ArduinoConnection {
     }
 
     public static void arduinoWrite(String a){ // Writes to arduino code. Arduino takes number and proceeds to hold relay open for 2sec
-        try{Thread.sleep(5);} catch(Exception ignored){}
-        PrintWriter send = new PrintWriter(ardAccess.getOutputStream());
-        send.print(a);
-        send.flush();
+
+        try{
+            if (ArduinoConnection.ardAccess != null && ArduinoConnection.ardAccess.isOpen()) {
+                Thread.sleep(5);
+                PrintWriter send = new PrintWriter(ardAccess.getOutputStream());
+                send.print(a);
+                send.flush();
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 }

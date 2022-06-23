@@ -27,7 +27,7 @@ public class GUI extends Main {
         button.addActionListener(listener);
         button.setEnabled(enabled);
         button.setFocusPainted(false);
-        button.setBorder(new RoundedBorder(Color.decode("#212426"), 8, 40));
+        //button.setBorder(new RoundedBorder(Color.decode("#212426"), 8, 40));
         button.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {

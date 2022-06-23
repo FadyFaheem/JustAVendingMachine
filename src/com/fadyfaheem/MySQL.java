@@ -75,14 +75,56 @@ public class MySQL {
                rowName = rs.getString("row");
             }
 
-            if (rowName != "") {
-                return true;
-            } else {
-                return false;
-            }
+            return !rowName.equals("");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean doesRowHaveItems(String rowStr) {
+        String sql = "SELECT machineRows.amountOfItemsInRow FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            int itemInMachine = 0;
+            while (rs.next()) {
+                itemInMachine = rs.getInt("amountOfItemsInRow");
+            }
+            return itemInMachine >= 1;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void removeBoughtItem(String rowStr) {
+        String sql = "SELECT machineRows.amountOfItemsInRow FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            int itemInMachine = 0;
+            while (rs.next()) {
+                itemInMachine = rs.getInt("amountOfItemsInRow");
+            }
+            if (itemInMachine > 0) {
+                itemInMachine--;
+            }
+            String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `amountOfItemsInRow` = '" + itemInMachine + "' WHERE (`row` = '"+ rowStr +"')";
+            PreparedStatement exstmt = connection.prepareStatement(updateSQL);
+            exstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void updateItemAmount(String rowStr, int itemsPlaced) {
+    }
+
+    public static void updateAllItemAmount(int itemAmount) {
+
+    }
+
+    public static void costOfItem (String rowStr) {
+
     }
 
     public static void activateMotorForRow(String rowStr) {
@@ -96,9 +138,7 @@ public class MySQL {
                 relay = rs.getInt("relayLineNum");
             }
 
-            if (ArduinoConnection.ardAccess != null && ArduinoConnection.ardAccess.isOpen()) {
-                ArduinoConnection.arduinoWrite(relay + "");
-            }
+            ArduinoConnection.arduinoWrite(relay + "");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
