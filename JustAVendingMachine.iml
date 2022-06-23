@@ -10,7 +10,7 @@
     <orderEntry type="library" name="jPyramidRS-232-1.2.7" level="project" />
     <orderEntry type="library" name="slf4j-api-1.7.36" level="project" />
     <orderEntry type="library" name="slf4j-simple-1.7.36" level="project" />
-    <orderEntry type="library" name="mysql-connector-java-8.0.29" level="project" />
     <orderEntry type="library" name="jSerialComm-2.9.2" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-8.0.29" level="project" />
   </component>
 </module>

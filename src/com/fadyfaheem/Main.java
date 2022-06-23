@@ -13,6 +13,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 
@@ -72,6 +75,22 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         guiSetup(); // Sets up GUI
         //connectBillAcceptor(); // Initiates bill acceptor // Disabled when not in use
         connectToArd(); // Creates connection to arduino
+        mySQLConnect();
+    }
+
+    public void mySQLConnect() {
+        String url = "jdbc:mysql://localhost:3306/vendingMachine";
+        String username = "vending";
+        String password = "dWPZVB4o8WUzg1";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot connect the database!", e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void connectToArd(){
