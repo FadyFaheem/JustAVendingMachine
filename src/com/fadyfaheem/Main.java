@@ -12,13 +12,16 @@ import java.awt.event.ActionListener;
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
-    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel;
+    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel, adminPasscodeLabel;
     private JButton aButton, bButton, cButton, dButton,
             eButton, numOneButton, numTwoButton,
             numThreeButton, numFourButton, numFiveButton,
             numSixButton, numSevenButton, numEightButton,
             numNineButton, clearButton, vendButton,
-            adminButton;
+            adminButton, adminOneButton, adminTwoButton, adminThreeButton,
+            adminFourButton, adminFiveButton, adminSixButton,
+            adminSevenButton, adminEightButton, adminNineButton,
+            adminClearButton, adminZeroButton, adminEnterButton;
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
     private boolean letterAdded = false; // bool to check for input
@@ -31,6 +34,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         addDollarBill();
+        MySQL.updateAllItemNameInRow("Generic Item");
     }
 
 
@@ -147,6 +151,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminButton.setBorderPainted(false);
         adminButton.setBorder(BorderFactory.createEmptyBorder());
         mainWindow.add(adminButton);
+
 
     }
 
