@@ -1,8 +1,4 @@
 package com.fadyfaheem;
-
-import com.fazecast.jSerialComm.SerialPort;
-import com.pyramidacceptors.ptalk.api.PyramidAcceptor;
-import com.pyramidacceptors.ptalk.api.PyramidDeviceException;
 import com.pyramidacceptors.ptalk.api.event.CreditEvent;
 import com.pyramidacceptors.ptalk.api.event.Events;
 import com.pyramidacceptors.ptalk.api.event.PTalkEvent;
@@ -12,11 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
@@ -30,95 +21,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
-    private final String[][] optionsAvailableArray = new String[][] // This lists the avaliable rows and selection for relay
-            {{"A1", "2"},
-                    {"A2", "2"},
-                    {"A3", "2"},
-                    {"A4", "2"},
-                    {"A5", "2"},
-                    {"B1", "2"},
-                    {"B2", "2"},
-                    {"B3", "2"},
-                    {"B4", "2"},
-                    {"B5", "2"},
-                    {"B6", "2"},
-                    {"C1", "2"},
-                    {"C2", "2"},
-                    {"C3", "2"},
-                    {"C4", "2"},
-                    {"C5", "2"},
-                    {"C6", "2"},
-                    {"D1", "2"},
-                    {"D2", "2"},
-                    {"D3", "2"},
-                    {"D4", "2"},
-                    {"D5", "2"},
-                    {"D6", "2"},
-                    {"D7", "2"},
-                    {"D8", "2"},
-                    {"D9", "2"},
-                    {"E1", "2"},
-                    {"E2", "2"},
-                    {"E3", "2"},
-                    {"E4", "2"},
-                    {"E5", "2"},
-                    {"E6", "2"},
-                    {"E7", "2"},
-                    {"E8", "2"},
-                    {"E9", "15"}
-            };
 
-    PyramidAcceptor acceptor;
-    static SerialPort ardAccess;
 
     public Main() {
         guiSetup(); // Sets up GUI
-        //connectBillAcceptor(); // Initiates bill acceptor // Disabled when not in use
-        connectToArd(); // Creates connection to arduino
-        mySQLConnect();
+        //BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
+        ArduinoConnection.connectToArd(); // Creates connection to arduino
+        MySQL.mySQLConnect();
+        addDollarBill();
     }
 
-    public void mySQLConnect() {
-        String url = "jdbc:mysql://localhost:3306/vendingMachine";
-        String username = "vending";
-        String password = "dWPZVB4o8WUzg1";
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            throw new IllegalStateException("Cannot connect the database!", e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void connectToArd(){
-        SerialPort[] portNames = SerialPort.getCommPorts(); // Gets all serial ports available
-        ArrayList<String> ports = new ArrayList<>(); // array to store port non descriptive port names
-        for (SerialPort port : portNames) { // Takes all ports and parses them into Arraylist String
-            ports.add(port.getSystemPortName());
-        }
-        for (String port : ports) { // This gets a little messy. Takes all ports against serial port descriptive name and looks for Arduino specfic port.
-            // I have no clue if this will work or not. however I do hope so It does.
-            for (SerialPort serPort: portNames) {
-                if (serPort.getDescriptivePortName().equals("Arduino Mega 2560 ("+ port + ")")){
-                    ardAccess = SerialPort.getCommPort(port);
-                    ardAccess.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
-                    if (ardAccess.openPort()) {
-                        System.out.println("Connected to arduino!");
-                    }
-                }
-            }
-        }
-    }
-
-    public void arduinoWrite(String a){ // Writes to arduino code. Arduino takes number and proceeds to hold relay open for 2sec
-        try{Thread.sleep(5);} catch(Exception ignored){}
-        PrintWriter send = new PrintWriter(ardAccess.getOutputStream());
-        send.print(a);
-        send.flush();
-    }
 
     public static void showOnScreen( int screen, JFrame frame )
     {
@@ -240,12 +152,13 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         }
 
         if (selectionString.length() == 2) {
-            selectLabel.setForeground(Color.red);
-            for (String[] strings : optionsAvailableArray) {
-                if (strings[0].equals(selectionString)) {
-                    selectLabel.setForeground(Color.white);
-                }
+            boolean checkRow = MySQL.doesRowExist(selectionString);
+            if (checkRow) {
+                selectLabel.setForeground(Color.white);
+            } else {
+                selectLabel.setForeground(Color.red);
             }
+
         }
     }
 
@@ -294,26 +207,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
     }
 
-
-
-
-    public void connectBillAcceptor() {
-        try {
-            acceptor = PyramidAcceptor.valueOfRS232();
-            acceptor.connect();
-            acceptor.addChangeListener(this);
-        } catch (PyramidDeviceException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void changeEventReceived(PTalkEvent evt) {
         if (evt.getId() == Events.Credit){
             if (((CreditEvent) evt).getBillName().name().equals("Bill1")) {
                 addDollarBill();
             }
-
         }
     }
 
@@ -377,11 +276,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                     if (dollarAvailable >= 1) {
                         dollarAvailable--;
                         moneyCounterLabel.setText("$" + dollarAvailable);
-                        for (String[] strings : optionsAvailableArray) {
-                            if (selectLabel.getText().equals(strings[0])) {
-                                arduinoWrite(strings[1]);
-                            }
-                        }
+                        MySQL.activateMotorForRow(selectionString);
                         clearSelect();
                         mainScreenVisibility(false);
                         vendingPendingVisibility();
