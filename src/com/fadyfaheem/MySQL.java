@@ -64,6 +64,10 @@ public class MySQL {
         }
     }
 
+    public static void changeItemUsingRowName(String row, int amountOfItemsInRow, int relayLineNum, int itemCost) {
+    }
+
+
     public static boolean doesRowExist(String rowStr) {
         String sql = "SELECT machineRows.row FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
         try {
@@ -116,6 +120,7 @@ public class MySQL {
         }
     }
 
+
     public static void updateItemAmount(String rowStr, int itemsPlaced) {
     }
 
@@ -123,7 +128,20 @@ public class MySQL {
 
     }
 
-    public static void costOfItem (String rowStr) {
+    public static int costOfItem (String rowStr) {
+        String sql = "SELECT machineRows.itemCost FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            int dollarCost = 0;
+            while (rs.next()) {
+                dollarCost = rs.getInt("itemCost");
+            }
+            return dollarCost;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
