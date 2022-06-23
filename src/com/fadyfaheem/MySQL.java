@@ -1,6 +1,7 @@
 package com.fadyfaheem;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class MySQL {
 
@@ -10,7 +11,6 @@ public class MySQL {
         String url = "jdbc:mysql://localhost:3306/vendingMachine";
         String username = "vending";
         String password = "dWPZVB4o8WUzg1";
-
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(url, username, password);
@@ -25,7 +25,7 @@ public class MySQL {
 
     public static void createSalesTable() { // Only Creates it if it doesn't exist
         String sqlCreate = "CREATE TABLE IF NOT EXISTS `vendingMachine`.`salesMade` (" +
-                "  `id` INT NOT NULL," +
+                "  `id` INT NOT NULL AUTO_INCREMENT," +
                 "  `soldItemName` VARCHAR(255) NULL," +
                 "  `priceOfSoldItem` INT NULL," +
                 "  PRIMARY KEY (`id`))";
@@ -35,7 +35,6 @@ public class MySQL {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public static void createDataTable() {
@@ -44,6 +43,7 @@ public class MySQL {
                 "  `amountOfItemsInRow` INT NOT NULL," +
                 "  `relayLineNum` INT NOT NULL," +
                 "  `itemCost` INT NOT NULL," +
+                "  `nameOfItemSold` VARCHAR(255) NOT NULL," +
                 "  PRIMARY KEY (`row`))";
         try {
             Statement stmt = connection.createStatement();
@@ -53,9 +53,9 @@ public class MySQL {
         }
     }
 
-    public static void createFullNewItem(String row, int amountOfItemsInRow, int relayLineNum, int itemCost) {
-        String sql = "INSERT IGNORE INTO `vendingMachine`.`machineRows` (`row`, `amountOfItemsInRow`, `relayLineNum`, `itemCost`)" +
-                " VALUES ('" + row + "', '" + amountOfItemsInRow + "', '" + relayLineNum + "', '"+ itemCost +"')";
+    public static void createFullNewItem(String row, int amountOfItemsInRow, int relayLineNum, int itemCost, String itemName) {
+        String sql = "INSERT IGNORE INTO `vendingMachine`.`machineRows` (`row`, `amountOfItemsInRow`, `relayLineNum`, `itemCost`, `nameOfItemSold`)" +
+                " VALUES ('" + row + "', '" + amountOfItemsInRow + "', '" + relayLineNum + "', '"+ itemCost +"', '"+ itemName +"' )";
         try {
             Statement stmt = connection.createStatement();
             stmt.execute(sql);
@@ -64,7 +64,7 @@ public class MySQL {
         }
     }
 
-    public static void changeItemUsingRowName(String row, int amountOfItemsInRow, int relayLineNum, int itemCost) {
+    public static void changeItemUsingRowName(String row, int amountOfItemsInRow, int relayLineNum, int itemCost, String itemName) {
     }
 
 
@@ -78,7 +78,6 @@ public class MySQL {
             {
                rowName = rs.getString("row");
             }
-
             return !rowName.equals("");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -122,11 +121,61 @@ public class MySQL {
 
 
     public static void updateItemAmount(String rowStr, int itemsPlaced) {
+        String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `amountOfItemsInRow` = '" + itemsPlaced + "' WHERE (`row` = '"+ rowStr +"')";
+        PreparedStatement exstmt = null;
+        try {
+            exstmt = connection.prepareStatement(updateSQL);
+            exstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void updateAllItemAmount(int itemAmount) {
-
+        String sql = "SELECT machineRows.row FROM vendingMachine.machineRows";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            ArrayList<String> rowName = new ArrayList<>();
+            while (rs.next()) {
+                rowName.add(rs.getString("row"));
+            }
+            for (String row : rowName) {
+                updateItemAmount(row, itemAmount);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public static void updateItemNameInRow(String rowStr, String itemName) {
+        String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `nameOfItemSold` = '" + itemName + "' WHERE (`row` = '"+ rowStr +"')";
+        PreparedStatement exstmt = null;
+        try {
+            exstmt = connection.prepareStatement(updateSQL);
+            exstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void updateAllItemNameInRow(String itemName) {
+        String sql = "SELECT machineRows.row FROM vendingMachine.machineRows";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            ArrayList<String> rowName = new ArrayList<>();
+            while (rs.next()) {
+                rowName.add(rs.getString("row"));
+            }
+            for (String row : rowName) {
+                updateItemNameInRow(row, itemName);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public static int costOfItem (String rowStr) {
         String sql = "SELECT machineRows.itemCost FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
@@ -141,8 +190,6 @@ public class MySQL {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     public static void activateMotorForRow(String rowStr) {
