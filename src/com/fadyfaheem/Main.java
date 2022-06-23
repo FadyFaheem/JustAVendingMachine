@@ -17,8 +17,10 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             eButton, numOneButton, numTwoButton,
             numThreeButton, numFourButton, numFiveButton,
             numSixButton, numSevenButton, numEightButton,
-            numNineButton, clearButton, vendButton;
+            numNineButton, clearButton, vendButton,
+            adminButton;
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
+    private int adminSwitch = 0;
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
 
@@ -29,6 +31,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         addDollarBill();
+        MySQL.removeBoughtItem("A1");
     }
 
 
@@ -136,6 +139,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         vendingPendingLabel = GUI.labelSetup("Vending...", 200, 0,760,1080,400, true);
         vendingPendingLabel.setVisible(false);
         mainWindow.add(vendingPendingLabel);
+
+
+        // Admin Menu
+        adminButton = GUI.buttonSetup("", 0, 885, -10, 200,200,this, true);
+        adminButton.setOpaque(false);
+        adminButton.setContentAreaFilled(false);
+        adminButton.setBorderPainted(false);
+        adminButton.setBorder(BorderFactory.createEmptyBorder());
+        mainWindow.add(adminButton);
+
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -153,7 +166,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         if (selectionString.length() == 2) {
             boolean checkRow = MySQL.doesRowExist(selectionString);
-            if (checkRow) {
+            boolean doesRowHaveItems = MySQL.doesRowHaveItems(selectionString);
+            if (checkRow && doesRowHaveItems) {
                 selectLabel.setForeground(Color.white);
             } else {
                 selectLabel.setForeground(Color.red);
@@ -167,6 +181,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         selectionString = "";
         selectLabel.setForeground(Color.white);
         selectLabel.setText(selectionString);
+        adminSwitch = 0;
     }
 
     public void addDollarBill() {
@@ -193,6 +208,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         numNineButton.setVisible(isVisible);
         clearButton.setVisible(isVisible);
         vendButton.setVisible(isVisible);
+        adminButton.setVisible(isVisible);
     }
 
     public void vendingPendingVisibility(){
@@ -273,14 +289,25 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         if (e.getSource() == vendButton) {
             if (selectionString.length() == 2) {
                 if (selectLabel.getForeground() == Color.white) {
+
                     if (dollarAvailable >= 1) {
                         dollarAvailable--;
                         moneyCounterLabel.setText("$" + dollarAvailable);
                         MySQL.activateMotorForRow(selectionString);
+                        MySQL.removeBoughtItem(selectionString);
                         clearSelect();
                         mainScreenVisibility(false);
                         vendingPendingVisibility();
                     }
+                }
+            }
+        }
+        if (e.getSource() == adminButton) {
+            if (selectionString.equals("A6")) {
+                adminSwitch++;
+                if (adminSwitch == 5) {
+                    adminSwitch = 0;
+                    mainScreenVisibility(false);
                 }
             }
         }
