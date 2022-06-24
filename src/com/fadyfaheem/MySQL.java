@@ -23,6 +23,10 @@ public class MySQL {
         createDataTable();
     }
 
+    public static void createSettingsTable() {
+
+    }
+
     public static void createSalesTable() { // Only Creates it if it doesn't exist
         String sqlCreate = "CREATE TABLE IF NOT EXISTS `vendingMachine`.`salesMade` (" +
                 "  `id` INT NOT NULL AUTO_INCREMENT," +
@@ -122,7 +126,7 @@ public class MySQL {
 
     public static void updateItemAmount(String rowStr, int itemsPlaced) {
         String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `amountOfItemsInRow` = '" + itemsPlaced + "' WHERE (`row` = '"+ rowStr +"')";
-        PreparedStatement exstmt = null;
+        PreparedStatement exstmt;
         try {
             exstmt = connection.prepareStatement(updateSQL);
             exstmt.executeUpdate();
@@ -150,7 +154,7 @@ public class MySQL {
 
     public static void updateItemNameInRow(String rowStr, String itemName) {
         String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `nameOfItemSold` = '" + itemName + "' WHERE (`row` = '"+ rowStr +"')";
-        PreparedStatement exstmt = null;
+        PreparedStatement exstmt;
         try {
             exstmt = connection.prepareStatement(updateSQL);
             exstmt.executeUpdate();

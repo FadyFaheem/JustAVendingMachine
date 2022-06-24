@@ -21,9 +21,11 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             adminButton, adminOneButton, adminTwoButton, adminThreeButton,
             adminFourButton, adminFiveButton, adminSixButton,
             adminSevenButton, adminEightButton, adminNineButton,
-            adminClearButton, adminZeroButton, adminEnterButton;
+            adminClearButton, adminZeroButton, adminEnterButton, adminBackButton;
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
+
+    private String adminPass = "";
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
 
@@ -34,7 +36,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         addDollarBill();
-        MySQL.updateAllItemNameInRow("Generic Item");
     }
 
 
@@ -67,7 +68,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE); //actually end the program when clicking the close button
         setTitle("Vending Machine");//text for the window's title bar
         setResizable(true);//don't allow the user to resize the window
-        setSize(540,960);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
+        setSize(1080 / 3,1920 / 3);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
 
         // TOP BAR
 
@@ -152,7 +153,50 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminButton.setBorder(BorderFactory.createEmptyBorder());
         mainWindow.add(adminButton);
 
+        adminOneButton = GUI.buttonSetup("1", 100, 200, 550, 200,200,this, true );
+        mainWindow.add(adminOneButton);
 
+        adminTwoButton = GUI.buttonSetup("2", 100, 450, 550, 200,200,this, true );
+        mainWindow.add(adminTwoButton);
+
+        adminThreeButton = GUI.buttonSetup("3", 100, 700, 550, 200,200,this, true );
+        mainWindow.add(adminThreeButton);
+
+        adminFourButton = GUI.buttonSetup("4", 100, 200, 800, 200,200,this, true );
+        mainWindow.add(adminFourButton);
+
+        adminFiveButton = GUI.buttonSetup("5", 100, 450, 800, 200,200,this, true );
+        mainWindow.add(adminFiveButton);
+
+        adminSixButton = GUI.buttonSetup("6", 100, 700, 800, 200,200,this, true );
+        mainWindow.add(adminSixButton);
+
+        adminSevenButton = GUI.buttonSetup("7", 100, 200, 1050, 200,200,this, true );
+        mainWindow.add(adminSevenButton);
+
+        adminEightButton = GUI.buttonSetup("8", 100, 450, 1050, 200,200,this, true );
+        mainWindow.add(adminEightButton);
+
+        adminNineButton = GUI.buttonSetup("9", 100, 700, 1050, 200,200,this, true );
+        mainWindow.add(adminNineButton);
+
+        adminClearButton = GUI.buttonSetup("Clear", 50, 200, 1300, 200,200,this, true );
+        mainWindow.add(adminClearButton);
+
+        adminZeroButton = GUI.buttonSetup("0", 100, 450, 1300, 200,200,this, true );
+        mainWindow.add(adminZeroButton);
+
+        adminEnterButton = GUI.buttonSetup("Enter", 50, 700, 1300, 200,200,this, true );
+        mainWindow.add(adminEnterButton);
+
+        adminBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true );
+        mainWindow.add(adminBackButton);
+
+        adminPasscodeLabel = GUI.labelSetup("", 100, 355,275,400,200, true);
+        mainWindow.add(adminPasscodeLabel);
+
+        //mainScreenVisibility(false);
+        adminLoginVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -215,6 +259,23 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminButton.setVisible(isVisible);
     }
 
+    public void adminLoginVisibility(boolean isVisible) {
+        adminOneButton.setVisible(isVisible);
+        adminTwoButton.setVisible(isVisible);
+        adminThreeButton.setVisible(isVisible);
+        adminFourButton.setVisible(isVisible);
+        adminFiveButton.setVisible(isVisible);
+        adminSixButton.setVisible(isVisible);
+        adminSevenButton.setVisible(isVisible);
+        adminEightButton.setVisible(isVisible);
+        adminNineButton.setVisible(isVisible);
+        adminClearButton.setVisible(isVisible);
+        adminZeroButton.setVisible(isVisible);
+        adminEnterButton.setVisible(isVisible);
+        adminPasscodeLabel.setVisible(isVisible);
+        adminBackButton.setVisible(isVisible);
+    }
+
     public void vendingPendingVisibility(){
         vendingPendingLabel.setVisible(true);
         ActionListener task = evt -> {
@@ -234,6 +295,24 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 addDollarBill();
             }
         }
+    }
+
+    public void adminPassCodeLabelSet() {
+        adminPasscodeLabel.setText("");
+        StringBuilder adminLabelSet = new StringBuilder();
+        int adminCount = adminPass.length();
+        for (int i = 0; i < adminCount; i++) {
+            adminLabelSet.append("*");
+        }
+        adminPasscodeLabel.setText(adminLabelSet.toString());
+    }
+
+    public void adminPassAdd(String passNum) {
+        if (adminPass.length() != 6) {
+            adminPass += passNum;
+            adminPassCodeLabelSet();
+        }
+
     }
 
 
@@ -312,8 +391,55 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 if (adminSwitch == 5) {
                     adminSwitch = 0;
                     mainScreenVisibility(false);
+                    adminLoginVisibility(true);
                 }
             }
+        }
+        if (e.getSource() == adminBackButton) {
+            clearSelect();
+            adminLoginVisibility(false);
+            mainScreenVisibility(true);
+        }
+
+        if (e.getSource() == adminOneButton) {
+            adminPassAdd("1");
+        }
+        if (e.getSource() == adminTwoButton) {
+            adminPassAdd("2");
+        }
+        if (e.getSource() == adminThreeButton) {
+            adminPassAdd("3");
+        }
+        if (e.getSource() == adminFourButton) {
+            adminPassAdd("4");
+        }
+        if (e.getSource() == adminFiveButton) {
+            adminPassAdd("5");
+        }
+        if (e.getSource() == adminSixButton) {
+            adminPassAdd("6");
+        }
+        if (e.getSource() == adminSevenButton) {
+            adminPassAdd("7");
+        }
+        if (e.getSource() == adminEightButton) {
+            adminPassAdd("8");
+        }
+        if (e.getSource() == adminNineButton) {
+            adminPassAdd("9");
+        }
+        if (e.getSource() == adminZeroButton) {
+            adminPassAdd("0");
+        }
+
+        if (e.getSource() == adminEnterButton) {
+            System.out.println("YOU WERE SUPPOSED TO ADD THIS FUNCTION BUT YOU LAZIED OUT");
+        }
+
+
+        if (e.getSource() == adminClearButton) {
+            adminPass = "";
+            adminPassCodeLabelSet();
         }
 
 
