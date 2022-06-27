@@ -21,15 +21,26 @@ public class MySQL {
         }
         createSalesTable();
         createDataTable();
+        createSettingsTable();
     }
 
     public static void createSettingsTable() {
-
+        String sqlCreate = "CREATE TABLE IF NOT EXISTS `vendingMachine`.`settings` (" +
+                "  `name` VARCHAR(255) NOT NULL," +
+                "  `value` VARCHAR(255) NOT NULL," +
+                "  PRIMARY KEY (`name`))";
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute(sqlCreate);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void createSalesTable() { // Only Creates it if it doesn't exist
         String sqlCreate = "CREATE TABLE IF NOT EXISTS `vendingMachine`.`salesMade` (" +
                 "  `id` INT NOT NULL AUTO_INCREMENT," +
+                "  `row` VARCHAR(255) NOT NULL," +
                 "  `soldItemName` VARCHAR(255) NULL," +
                 "  `priceOfSoldItem` INT NULL," +
                 "  PRIMARY KEY (`id`))";
@@ -121,6 +132,10 @@ public class MySQL {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void createSale(String rowStr) {
+        String sql = "INSERT INTO `vendingMachine`.`salesMade` (`row`, `soldItemName`, `priceOfSoldItem`) VALUES ('A5', 'a', '1')";
     }
 
 
