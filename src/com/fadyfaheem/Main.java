@@ -399,6 +399,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             clearSelect();
             adminLoginVisibility(false);
             mainScreenVisibility(true);
+            adminPass = "";
+            adminPassCodeLabelSet();
         }
 
         if (e.getSource() == adminOneButton) {
@@ -433,7 +435,20 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         }
 
         if (e.getSource() == adminEnterButton) {
-            System.out.println("YOU WERE SUPPOSED TO ADD THIS FUNCTION BUT YOU LAZIED OUT");
+            if (adminPass.length() >= 4) {
+                if (!MySQL.doesAdminPassExist()){
+                    MySQL.createAdminPass(adminPass);
+                    adminPass = "";
+                    adminPassCodeLabelSet();
+                } else {
+                    if (MySQL.isAdminPassCorrect(adminPass)) {
+                        adminLoginVisibility(false);
+                    }
+                    adminPass = "";
+                    adminPassCodeLabelSet();
+                }
+            }
+
         }
 
 
