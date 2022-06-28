@@ -1,5 +1,7 @@
 package com.fadyfaheem;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -114,6 +116,70 @@ public class MySQL {
         }
     }
 
+    public static boolean doesAdminPassExist() {
+        String adminHash = "";
+        String sqlOne = "SELECT * FROM vendingMachine.settings where settings.name = 'adminHash'";
+        try {
+            Statement stmtOne = connection.createStatement();
+            ResultSet rsOne = stmtOne.executeQuery(sqlOne);
+            while (rsOne.next()) {
+                adminHash = rsOne.getString("value");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return adminHash.length() > 1;
+
+    }
+
+
+    public static void createAdminPass(String pass) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.reset();
+            byte[] hash = digest.digest(pass.getBytes());
+            String sql = "INSERT IGNORE INTO `vendingMachine`.`settings` (`name`, `value`) VALUES ('adminHash', '" + bytesToStringHex(hash) + "')";
+            Statement stmt = connection.createStatement();
+            stmt.execute(sql);
+        } catch (NoSuchAlgorithmException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToStringHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int i = 0; i < bytes.length; i++) {
+            int v = bytes[i] & 0xFF;
+            hexChars[i * 2] = hexArray[v >>> 4];
+            hexChars[i * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+
+    public static boolean isAdminPassCorrect(String pass) { // THIS IS A BOOLEAN
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.reset();
+            byte[] hash = digest.digest(pass.getBytes());
+            String serverHashedPassword = "";
+            String sql = "SELECT * FROM vendingMachine.settings where settings.name = 'adminHash'";
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                serverHashedPassword = rs.getString("value");
+            }
+
+            return bytesToStringHex(hash).equals(serverHashedPassword);
+
+        } catch (NoSuchAlgorithmException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public static void removeBoughtItem(String rowStr) {
         String sql = "SELECT machineRows.amountOfItemsInRow FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
         try {
@@ -129,17 +195,33 @@ public class MySQL {
             String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `amountOfItemsInRow` = '" + itemInMachine + "' WHERE (`row` = '"+ rowStr +"')";
             PreparedStatement exstmt = connection.prepareStatement(updateSQL);
             exstmt.executeUpdate();
+            createSale(rowStr);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static void createSale(String rowStr) {
-        String sql = "INSERT INTO `vendingMachine`.`salesMade` (`row`, `soldItemName`, `priceOfSoldItem`) VALUES ('A5', 'a', '1')";
+        String soldItemName = "";
+        int itemPrice = 0;
+        String sqlSelect = "SELECT machineRows.itemCost, machineRows.nameOfItemSold FROM vendingMachine.machineRows where machineRows.row = '" + rowStr + "'";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlSelect);
+            while (rs.next()) {
+                itemPrice = rs.getInt("itemCost");
+                soldItemName = rs.getString("nameOfItemSold");
+            }
+
+            String sql = "INSERT INTO `vendingMachine`.`salesMade` (`row`, `soldItemName`, `priceOfSoldItem`) VALUES ('" + rowStr + "', '" + soldItemName + "', '" + itemPrice + "')";
+            Statement exstmt = connection.createStatement();
+            exstmt.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-
-    public static void updateItemAmount(String rowStr, int itemsPlaced) {
+        public static void updateItemAmount(String rowStr, int itemsPlaced) {
         String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `amountOfItemsInRow` = '" + itemsPlaced + "' WHERE (`row` = '"+ rowStr +"')";
         PreparedStatement exstmt;
         try {
