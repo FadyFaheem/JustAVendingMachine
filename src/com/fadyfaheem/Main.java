@@ -29,7 +29,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 7", "Option 7"};
+    private final String[] adminMenuOptions = {"Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 9", "Option 10", "Option 11"};
 
     private int onPageNum = 0;
 
@@ -398,6 +398,13 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         for (JButton button: adminMenuButtons) {
             button.setVisible(false);
         }
+        for (int i = 0; i < adminMenuButtons.size(); i++){
+            if (adminMenuOptions.length > (i + (onPageNum * 5))) {
+                adminMenuButtons.get(i).setVisible(true);
+                adminMenuButtons.get(i).setText(adminMenuOptions[i + (onPageNum * 5)]);
+            }
+        }
+        adminPageLabel.setText((onPageNum + 1) + " of " + maxPageNum);
     }
 
 
@@ -540,6 +547,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                         adminLoginVisibility(false);
                         adminControlPanelVisibility(true);
                         passCounter.stop();
+                        pageLoad();
                     }
                 }
                 adminPass = "";
@@ -587,10 +595,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         }
 
         if (e.getSource() == adminPageBack) {
+            if (onPageNum > 0) {
+                onPageNum--;
+            }
             pageLoad();
         }
 
         if (e.getSource() == adminPageForward) {
+            if (onPageNum < maxPageNum - 1) {
+                onPageNum++;
+            }
             pageLoad();
         }
 
