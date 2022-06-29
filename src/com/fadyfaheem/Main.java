@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
-    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel, adminPasscodeLabel;
+    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel, adminPasscodeLabel, adminPageLabel;
     private JButton aButton, bButton, cButton, dButton,
             eButton, numOneButton, numTwoButton,
             numThreeButton, numFourButton, numFiveButton,
@@ -21,7 +21,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             adminButton, adminOneButton, adminTwoButton, adminThreeButton,
             adminFourButton, adminFiveButton, adminSixButton,
             adminSevenButton, adminEightButton, adminNineButton,
-            adminClearButton, adminZeroButton, adminEnterButton, adminBackButton;
+            adminClearButton, adminZeroButton, adminEnterButton, adminBackButton,
+            adminOptionOne, adminOptionTwo, adminOptionThree, adminOptionFour,
+            adminOptionFive, adminControlBack, adminPageBack, adminPageForward;
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
@@ -145,7 +147,10 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         mainWindow.add(vendingPendingLabel);
 
 
-        // Admin Menu
+        // Admin Login Menu
+
+        //This is an invisible button used to access the menu without being noticed, it is placed within
+        // the top right corner of the screen and only works when a6 is typed
         adminButton = GUI.buttonSetup("", 0, 885, -10, 200,200,this, true);
         adminButton.setOpaque(false);
         adminButton.setContentAreaFilled(false);
@@ -195,8 +200,41 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminPasscodeLabel = GUI.labelSetup("", 100, 355,275,400,200, true);
         mainWindow.add(adminPasscodeLabel);
 
-        //mainScreenVisibility(false);
+        // Admin Control Panel
+        adminControlBack = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true );
+        mainWindow.add(adminControlBack);
+
+        adminOptionOne = GUI.buttonSetup("####", 50, 175,325,750, 200,this,true);
+        mainWindow.add(adminOptionOne);
+
+        adminOptionTwo = GUI.buttonSetup("####", 50, 175,575,750, 200,this,true);
+        mainWindow.add(adminOptionTwo);
+
+        adminOptionThree = GUI.buttonSetup("####", 50, 175,825,750, 200,this,true);
+        mainWindow.add(adminOptionThree);
+
+        adminOptionFour = GUI.buttonSetup("####", 50, 175,1075,750, 200,this,true);
+        mainWindow.add(adminOptionFour);
+
+        adminOptionFive = GUI.buttonSetup("####", 50, 175,1325,750, 200,this,true);
+        mainWindow.add(adminOptionFive);
+
+        adminPageBack = GUI.buttonSetup("←", 50, 175, 1575, 200,200,this, true);
+        mainWindow.add(adminPageBack);
+
+        adminPageForward = GUI.buttonSetup("→", 50, 725, 1575, 200,200,this, true);
+        mainWindow.add(adminPageForward);
+
+        adminPageLabel = GUI.labelSetup("# of #", 50, 400, 1575, 300,200, true);
+        mainWindow.add(adminPageLabel);
+
+
+
+
+
+        mainScreenVisibility(false);
         adminLoginVisibility(false);
+        adminControlPanelVisibility(true);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -274,6 +312,18 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminEnterButton.setVisible(isVisible);
         adminPasscodeLabel.setVisible(isVisible);
         adminBackButton.setVisible(isVisible);
+    }
+
+    public void adminControlPanelVisibility(boolean isVisible) {
+        adminOptionOne.setVisible(isVisible);
+        adminOptionTwo.setVisible(isVisible);
+        adminOptionThree.setVisible(isVisible);
+        adminOptionFour.setVisible(isVisible);
+        adminOptionFive.setVisible(isVisible);
+        adminControlBack.setVisible(isVisible);
+        adminPageForward.setVisible(isVisible);
+        adminPageBack.setVisible(isVisible);
+        adminPageLabel.setVisible(isVisible);
     }
 
     public void vendingPendingVisibility(){
@@ -438,15 +488,13 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             if (adminPass.length() >= 4) {
                 if (!MySQL.doesAdminPassExist()){
                     MySQL.createAdminPass(adminPass);
-                    adminPass = "";
-                    adminPassCodeLabelSet();
                 } else {
                     if (MySQL.isAdminPassCorrect(adminPass)) {
                         adminLoginVisibility(false);
                     }
-                    adminPass = "";
-                    adminPassCodeLabelSet();
                 }
+                adminPass = "";
+                adminPassCodeLabelSet();
             }
 
         }
