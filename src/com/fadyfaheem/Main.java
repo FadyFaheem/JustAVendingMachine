@@ -1,4 +1,5 @@
 package com.fadyfaheem;
+
 import com.pyramidacceptors.ptalk.api.event.CreditEvent;
 import com.pyramidacceptors.ptalk.api.event.Events;
 import com.pyramidacceptors.ptalk.api.event.PTalkEvent;
@@ -8,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
@@ -27,6 +29,13 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
+    private final String[] adminMenuOptions = {"Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 7", "Option 7"};
+
+    private int onPageNum = 0;
+
+    private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
+
+    private ArrayList<JButton> adminMenuButtons = new ArrayList<>();
     private String adminPass = "";
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
@@ -38,6 +47,15 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         addDollarBill();
+    }
+
+    public void appendAdminMenuButtons() {
+        adminMenuButtons.add(adminOptionOne);
+        adminMenuButtons.add(adminOptionTwo);
+        adminMenuButtons.add(adminOptionThree);
+        adminMenuButtons.add(adminOptionFour);
+        adminMenuButtons.add(adminOptionFive);
+
     }
 
 
@@ -204,37 +222,35 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminControlBack = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true );
         mainWindow.add(adminControlBack);
 
-        adminOptionOne = GUI.buttonSetup("####", 50, 175,325,750, 200,this,true);
+        adminOptionOne = GUI.buttonSetup("1", 50, 175,325,750, 200,this,true);
         mainWindow.add(adminOptionOne);
 
-        adminOptionTwo = GUI.buttonSetup("####", 50, 175,575,750, 200,this,true);
+        adminOptionTwo = GUI.buttonSetup("2", 50, 175,575,750, 200,this,true);
         mainWindow.add(adminOptionTwo);
 
-        adminOptionThree = GUI.buttonSetup("####", 50, 175,825,750, 200,this,true);
+        adminOptionThree = GUI.buttonSetup("3", 50, 175,825,750, 200,this,true);
         mainWindow.add(adminOptionThree);
 
-        adminOptionFour = GUI.buttonSetup("####", 50, 175,1075,750, 200,this,true);
+        adminOptionFour = GUI.buttonSetup("4", 50, 175,1075,750, 200,this,true);
         mainWindow.add(adminOptionFour);
 
-        adminOptionFive = GUI.buttonSetup("####", 50, 175,1325,750, 200,this,true);
+        adminOptionFive = GUI.buttonSetup("5", 50, 175,1325,750, 200,this,true);
         mainWindow.add(adminOptionFive);
 
-        adminPageBack = GUI.buttonSetup("←", 50, 175, 1575, 200,200,this, true);
+        adminPageBack = GUI.buttonSetup("←", 100, 175, 1575, 200,200,this, true);
         mainWindow.add(adminPageBack);
 
-        adminPageForward = GUI.buttonSetup("→", 50, 725, 1575, 200,200,this, true);
+        adminPageForward = GUI.buttonSetup("→", 100, 725, 1575, 200,200,this, true);
         mainWindow.add(adminPageForward);
 
         adminPageLabel = GUI.labelSetup("# of #", 50, 400, 1575, 300,200, true);
         mainWindow.add(adminPageLabel);
 
+        appendAdminMenuButtons();
 
-
-
-
-        mainScreenVisibility(false);
+        //mainScreenVisibility(false);
         adminLoginVisibility(false);
-        adminControlPanelVisibility(true);
+        adminControlPanelVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -274,6 +290,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         dollarAvailable++;
         moneyCounterLabel.setText("$" + dollarAvailable);
     }
+
+    // This is used to change back to normal screen if password isn't typed in and correct.
+    ActionListener passwordDelay = evt -> {
+        adminLoginVisibility(false);
+        mainScreenVisibility(true);
+        clearSelect();
+        adminPass = "";
+        adminPassCodeLabelSet();
+    };
+    Timer passCounter = new Timer(15000, passwordDelay);
 
     public void mainScreenVisibility(boolean isVisible) {
         moneyCounterLabel.setVisible(isVisible);
@@ -362,7 +388,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             adminPass += passNum;
             adminPassCodeLabelSet();
         }
+    }
 
+    public void adminMenuSelect(String menuSelect) {
+        System.out.println(menuSelect);
+    }
+
+    public void pageLoad() {
+        for (JButton button: adminMenuButtons) {
+            button.setVisible(false);
+        }
     }
 
 
@@ -374,6 +409,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        // MAIN MENU SCREEN
+
         if (e.getSource() == aButton) {
             addLetterNumber(true, "A");
         }
@@ -435,6 +473,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 }
             }
         }
+
+        //END OF MAIN MENU SCREEN
+
+
+        // ADMIN LOGIN PAGE WITH BUTTON ON MAIN MENU
+
         if (e.getSource() == adminButton) {
             if (selectionString.equals("A6")) {
                 adminSwitch++;
@@ -442,15 +486,18 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                     adminSwitch = 0;
                     mainScreenVisibility(false);
                     adminLoginVisibility(true);
+                    passCounter.setRepeats(false);
+                    passCounter.start();
                 }
             }
         }
         if (e.getSource() == adminBackButton) {
-            clearSelect();
             adminLoginVisibility(false);
             mainScreenVisibility(true);
+            clearSelect();
             adminPass = "";
             adminPassCodeLabelSet();
+            passCounter.stop();
         }
 
         if (e.getSource() == adminOneButton) {
@@ -491,6 +538,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 } else {
                     if (MySQL.isAdminPassCorrect(adminPass)) {
                         adminLoginVisibility(false);
+                        adminControlPanelVisibility(true);
+                        passCounter.stop();
                     }
                 }
                 adminPass = "";
@@ -499,12 +548,51 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         }
 
-
         if (e.getSource() == adminClearButton) {
             adminPass = "";
             adminPassCodeLabelSet();
         }
 
+
+        // END OF ADMIN LOGIN PAGE
+
+        // ADMIN CONTROL PANEL
+
+        if (e.getSource() == adminControlBack) {
+            adminControlPanelVisibility(false);
+            mainScreenVisibility(true);
+            clearSelect();
+            adminPass = "";
+            adminPassCodeLabelSet();
+        }
+
+        if (e.getSource() == adminOptionOne) {
+            adminMenuSelect(adminOptionOne.getText());
+        }
+
+        if (e.getSource() == adminOptionTwo) {
+            adminMenuSelect(adminOptionTwo.getText());
+        }
+
+        if (e.getSource() == adminOptionThree) {
+            adminMenuSelect(adminOptionThree.getText());
+        }
+
+        if (e.getSource() == adminOptionFour) {
+            adminMenuSelect(adminOptionFour.getText());
+        }
+
+        if (e.getSource() == adminOptionFive) {
+            adminMenuSelect(adminOptionFive.getText());
+        }
+
+        if (e.getSource() == adminPageBack) {
+            pageLoad();
+        }
+
+        if (e.getSource() == adminPageForward) {
+            pageLoad();
+        }
 
     }
 }
