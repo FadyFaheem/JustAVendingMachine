@@ -277,6 +277,20 @@ public class MySQL {
         }
     }
 
+    public static int amountOfItemsInRow(String rowStr) {
+        String sql = "SELECT machineRows.amountOfItemsInRow FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            int amountOfItemsInRow = 0;
+            while (rs.next()) {
+                amountOfItemsInRow = rs.getInt("amountOfItemsInRow");
+            }
+            return amountOfItemsInRow;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static int costOfItem (String rowStr) {
         String sql = "SELECT machineRows.itemCost FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
