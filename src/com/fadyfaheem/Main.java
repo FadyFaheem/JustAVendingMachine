@@ -17,7 +17,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel,
             adminPasscodeLabel, adminPageLabel,
             changeOfCostRowLabel, changeOfCostPriceLabel,
-            updateAllItemNumLabel;
+            updateAllItemNumLabel,
+            updateItemRowLabel, updateItemNumLabel;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
             eButton, numOneButton, numTwoButton, // MAIN SCREEN
             numThreeButton, numFourButton, numFiveButton, // MAIN SCREEN
@@ -31,7 +32,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             adminOptionFive, adminControlBack, adminPageBack, adminPageForward, // ADMIN CONTROL
             changeOfCostRowBack, changeOfCostRowForward, changeOfCostPriceForward, // CHANGE OF COST
             changeOfCostPriceBack, changeOfCostSave, changeOfCostBackButton, // CHANGE OF COST
-            updateAllItemNumBack, updateAllItemNumForward, updateAllItemBackButton, updateAllItemSave;
+            updateAllItemNumBack, updateAllItemNumForward, updateAllItemBackButton, updateAllItemSave, // CHANGE ALL ITEM
+            updateItemNumRowBack, updateItemNumRowForward, updateItemNumBack, updateItemNumForward, updateItemNumSave, updateItemNumBackButton;
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
@@ -304,6 +306,34 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateAllItemSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
         mainWindow.add(updateAllItemSave);
 
+        // END OF ALL ITEM AMOUNT
+
+        // UPDATE ITEM AMOUNT
+
+        updateItemNumBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(updateItemNumBackButton);
+
+        updateItemNumRowBack = GUI.buttonSetup("←", 100, 175, 500, 200,200,this, true);
+        mainWindow.add(updateItemNumRowBack);
+
+        updateItemNumRowForward = GUI.buttonSetup("→", 100, 725, 500, 200,200,this, true);
+        mainWindow.add(updateItemNumRowForward);
+
+        updateItemRowLabel = GUI.labelSetup("##", 100, 400, 500, 300,200, true);
+        mainWindow.add(updateItemRowLabel);
+
+        updateItemNumLabel = GUI.labelSetup("1", 100, 400, 1000, 300,200, true);
+        mainWindow.add(updateItemNumLabel);
+
+        updateItemNumBack = GUI.buttonSetup("←", 100, 175, 1000, 200,200,this, true);
+        mainWindow.add(updateItemNumBack);
+
+        updateItemNumForward = GUI.buttonSetup("→", 100, 725, 1000, 200,200,this, true);
+        mainWindow.add(updateItemNumForward);
+
+        updateItemNumSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(updateItemNumSave);
+
 
 
         //mainScreenVisibility(false);
@@ -311,6 +341,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminControlPanelVisibility(false);
         ChangeOfCostVisibility(false);
         UpdateAllItemVisibility(false);
+        UpdateItemAmountVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -431,6 +462,17 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateAllItemSave.setVisible(isVisible);
     }
 
+    public void UpdateItemAmountVisibility(boolean isVisible) {
+        updateItemNumBackButton.setVisible(isVisible);
+        updateItemNumRowBack.setVisible(isVisible);
+        updateItemNumRowForward.setVisible(isVisible);
+        updateItemRowLabel.setVisible(isVisible);
+        updateItemNumLabel.setVisible(isVisible);
+        updateItemNumBack.setVisible(isVisible);
+        updateItemNumForward.setVisible(isVisible);
+        updateItemNumSave.setVisible(isVisible);
+    }
+
 
     public void vendingPendingVisibility(){
         vendingPendingLabel.setVisible(true);
@@ -482,6 +524,10 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 adminControlPanelVisibility(false);
                 itemAllUpdateInt = 0;
                 updateAllItemNumLabel.setText(String.valueOf(itemAllUpdateInt));
+                break;
+            case "Update Item Amount":
+                UpdateItemAmountVisibility(true);
+                adminControlPanelVisibility(false);
                 break;
         }
     }
@@ -746,6 +792,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         // END OF CHANGE OF COST
 
+        // UPDATE ALL ITEMS AMOUNT
         if (e.getSource() == updateAllItemBackButton) {
             UpdateAllItemVisibility(false);
             adminControlPanelVisibility(true);
@@ -765,6 +812,15 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         if(e.getSource() == updateAllItemSave) {
             MySQL.updateAllItemAmount(itemAllUpdateInt);
+        }
+
+        // END OF UPDATE ALL ITEM AMOUNT
+
+        // UPDATE ITEM AMOUNT
+
+        if (e.getSource() == updateItemNumBackButton) {
+            UpdateItemAmountVisibility(false);
+            adminControlPanelVisibility(true);
         }
     }
 }
