@@ -41,7 +41,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
-
+    private int itemAmountIntRow = 0;
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
 
     private final ArrayList<JButton> adminMenuButtons = new ArrayList<>();
@@ -319,7 +319,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateItemNumRowForward = GUI.buttonSetup("→", 100, 725, 500, 200,200,this, true);
         mainWindow.add(updateItemNumRowForward);
 
-        updateItemRowLabel = GUI.labelSetup("##", 100, 400, 500, 300,200, true);
+        updateItemRowLabel = GUI.labelSetup("###", 100, 400, 500, 300,200, true);
         mainWindow.add(updateItemRowLabel);
 
         updateItemNumLabel = GUI.labelSetup("1", 100, 400, 1000, 300,200, true);
@@ -528,6 +528,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             case "Update Item Amount":
                 UpdateItemAmountVisibility(true);
                 adminControlPanelVisibility(false);
+                itemAmountIntRow = 0;
+                loadPageForItemAmount();
                 break;
         }
     }
@@ -537,7 +539,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         changeOfCostPriceLabel.setText("$" + MySQL.costOfItem(row.get(changeOfCostInt)));
     }
 
-    public void pageLoad() {
+    public void loadPageForItemAmount() {
+        updateItemRowLabel.setText(row.get(itemAmountIntRow));
+        updateItemNumLabel.setText(MySQL.amountOfItemsInRow(row.get(itemAmountIntRow)) + "");
+    }
+
+    public void adminPageLoad() {
         for (JButton button: adminMenuButtons) {
             button.setVisible(false);
         }
@@ -690,7 +697,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                         adminLoginVisibility(false);
                         adminControlPanelVisibility(true);
                         passCounter.stop();
-                        pageLoad();
+                        adminPageLoad();
                     }
                 }
                 adminPass = "";
@@ -741,14 +748,14 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             if (onPageNum > 0) {
                 onPageNum--;
             }
-            pageLoad();
+            adminPageLoad();
         }
 
         if (e.getSource() == adminPageForward) {
             if (onPageNum < maxPageNum - 1) {
                 onPageNum++;
             }
-            pageLoad();
+            adminPageLoad();
         }
 
         // END OF ADMIN CONTROL PANEL
@@ -821,6 +828,34 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         if (e.getSource() == updateItemNumBackButton) {
             UpdateItemAmountVisibility(false);
             adminControlPanelVisibility(true);
+        }
+
+        if(e.getSource() == updateItemNumRowBack) {
+            if (itemAmountIntRow > 0) {
+                itemAmountIntRow--;
+                loadPageForItemAmount();
+            }
+        }
+
+        if(e.getSource() == updateItemNumRowForward) {
+            if (itemAmountIntRow < row.size() - 1) {
+                itemAmountIntRow++;
+                loadPageForItemAmount();
+            }
+        }
+
+        if (e.getSource() == updateItemNumSave) {
+            MySQL.updateItemAmount(updateItemRowLabel.getText(), Integer.parseInt(updateItemNumLabel.getText()));
+        }
+
+        if (e.getSource() == updateItemNumForward) {
+            updateItemNumLabel.setText(String.valueOf(Integer.parseInt(updateItemNumLabel.getText()) + 1));
+        }
+
+        if (e.getSource() == updateItemNumBack) {
+            if (Integer.parseInt(updateItemNumLabel.getText()) > 0) {
+                updateItemNumLabel.setText(String.valueOf(Integer.parseInt(updateItemNumLabel.getText()) - 1));
+            }
         }
     }
 }
