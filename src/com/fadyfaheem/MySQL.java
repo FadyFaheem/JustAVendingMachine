@@ -293,6 +293,37 @@ public class MySQL {
         }
     }
 
+    public static void costOfItemChange(String rowStr, int cost) {
+        String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `itemCost` = '" + cost + "' WHERE (`row` = '"+ rowStr +"')";
+        PreparedStatement exstmt;
+        try {
+            exstmt = connection.prepareStatement(updateSQL);
+            exstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ArrayList<String> rowList() {
+        ArrayList<String> rows = new ArrayList<>();
+
+        String sql = "SELECT machineRows.row FROM vendingMachine.machineRows";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()) {
+                rows.add(rs.getString("row"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rows;
+    }
+
+    public static void changeRelayLineNum (String rowStr, int relayLineNum) {
+
+    }
+
     public static void activateMotorForRow(String rowStr) {
         String sql = "SELECT machineRows.relayLineNum FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
         try {
