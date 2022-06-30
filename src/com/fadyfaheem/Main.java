@@ -14,28 +14,35 @@ import java.util.ArrayList;
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
-    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel, adminPasscodeLabel, adminPageLabel;
-    private JButton aButton, bButton, cButton, dButton,
-            eButton, numOneButton, numTwoButton,
-            numThreeButton, numFourButton, numFiveButton,
-            numSixButton, numSevenButton, numEightButton,
-            numNineButton, clearButton, vendButton,
-            adminButton, adminOneButton, adminTwoButton, adminThreeButton,
-            adminFourButton, adminFiveButton, adminSixButton,
-            adminSevenButton, adminEightButton, adminNineButton,
-            adminClearButton, adminZeroButton, adminEnterButton, adminBackButton,
-            adminOptionOne, adminOptionTwo, adminOptionThree, adminOptionFour,
-            adminOptionFive, adminControlBack, adminPageBack, adminPageForward;
+    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel, adminPasscodeLabel, adminPageLabel, changeOfCostRowLabel, changeOfCostPriceLabel;
+    private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
+            eButton, numOneButton, numTwoButton, // MAIN SCREEN
+            numThreeButton, numFourButton, numFiveButton, // MAIN SCREEN
+            numSixButton, numSevenButton, numEightButton, // MAIN SCREEN
+            numNineButton, clearButton, vendButton, // MAIN SCREEN
+            adminButton, adminOneButton, adminTwoButton, adminThreeButton, // ADMIN LOGIN
+            adminFourButton, adminFiveButton, adminSixButton, // ADMIN LOGIN
+            adminSevenButton, adminEightButton, adminNineButton, // ADMIN LOGIN
+            adminClearButton, adminZeroButton, adminEnterButton, adminBackButton, // ADMIN LOGIN
+            adminOptionOne, adminOptionTwo, adminOptionThree, adminOptionFour, // ADMIN CONTROL
+            adminOptionFive, adminControlBack, adminPageBack, adminPageForward, // ADMIN CONTROL
+
+            changeOfCostRowBack, changeOfCostRowForward, changeOfCostPriceForward, // CHANGE OF COST
+
+            changeOfCostPriceBack, changeOfCostSave, changeOfCostBackButton; // CHANGE OF COST
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 9", "Option 10", "Option 11"};
+    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Create new Item", "Change Item Using Row", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password"};
 
     private int onPageNum = 0;
 
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
 
-    private ArrayList<JButton> adminMenuButtons = new ArrayList<>();
+    private final ArrayList<JButton> adminMenuButtons = new ArrayList<>();
+
+    private int changeOfCostInt = 0;
+    private ArrayList<String> row;
     private String adminPass = "";
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
@@ -47,6 +54,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         addDollarBill();
+        row = MySQL.rowList();
     }
 
     public void appendAdminMenuButtons() {
@@ -55,9 +63,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminMenuButtons.add(adminOptionThree);
         adminMenuButtons.add(adminOptionFour);
         adminMenuButtons.add(adminOptionFive);
-
     }
-
 
     public static void showOnScreen( int screen, JFrame frame )
     {
@@ -219,7 +225,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         mainWindow.add(adminPasscodeLabel);
 
         // Admin Control Panel
-        adminControlBack = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true );
+        adminControlBack = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
         mainWindow.add(adminControlBack);
 
         adminOptionOne = GUI.buttonSetup("1", 50, 175,325,750, 200,this,true);
@@ -248,9 +254,39 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         appendAdminMenuButtons();
 
+        // END OF ADMIN PANEL
+
+        // CHANGE OF ROW COST
+
+        changeOfCostBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(changeOfCostBackButton);
+
+        changeOfCostRowBack = GUI.buttonSetup("←", 100, 175, 500, 200,200,this, true);
+        mainWindow.add(changeOfCostRowBack);
+
+        changeOfCostRowForward = GUI.buttonSetup("→", 100, 725, 500, 200,200,this, true);
+        mainWindow.add(changeOfCostRowForward);
+
+        changeOfCostRowLabel = GUI.labelSetup("##", 100, 400, 500, 300,200, true);
+        mainWindow.add(changeOfCostRowLabel);
+
+        changeOfCostPriceLabel = GUI.labelSetup("$1", 100, 400, 1000, 300,200, true);
+        mainWindow.add(changeOfCostPriceLabel);
+
+        changeOfCostPriceBack = GUI.buttonSetup("←", 100, 175, 1000, 200,200,this, true);
+        mainWindow.add(changeOfCostPriceBack);
+
+        changeOfCostPriceForward = GUI.buttonSetup("→", 100, 725, 1000, 200,200,this, true);
+        mainWindow.add(changeOfCostPriceForward);
+
+        changeOfCostSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(changeOfCostSave);
+
+
         //mainScreenVisibility(false);
         adminLoginVisibility(false);
         adminControlPanelVisibility(false);
+        ChangeOfCostVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -352,6 +388,18 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminPageLabel.setVisible(isVisible);
     }
 
+    public void ChangeOfCostVisibility(boolean isVisible) {
+        changeOfCostRowBack.setVisible(isVisible);
+        changeOfCostRowForward.setVisible(isVisible);
+        changeOfCostBackButton.setVisible(isVisible);
+        changeOfCostPriceForward.setVisible(isVisible);
+        changeOfCostPriceBack.setVisible(isVisible);
+        changeOfCostRowLabel.setVisible(isVisible);
+        changeOfCostPriceLabel.setVisible(isVisible);
+        changeOfCostSave.setVisible(isVisible);
+    }
+
+
     public void vendingPendingVisibility(){
         vendingPendingLabel.setVisible(true);
         ActionListener task = evt -> {
@@ -391,7 +439,19 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     }
 
     public void adminMenuSelect(String menuSelect) {
-        System.out.println(menuSelect);
+        switch (menuSelect) {
+            case "Change Cost of Item":
+                ChangeOfCostVisibility(true);
+                adminControlPanelVisibility(false);
+                changeOfCostInt = 0;
+                loadPageInfoForPriceCost();
+                break;
+        }
+    }
+
+    public void loadPageInfoForPriceCost() {
+        changeOfCostRowLabel.setText(row.get(changeOfCostInt));
+        changeOfCostPriceLabel.setText("$" + MySQL.costOfItem(row.get(changeOfCostInt)));
     }
 
     public void pageLoad() {
@@ -606,6 +666,45 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 onPageNum++;
             }
             pageLoad();
+        }
+
+        // END OF ADMIN CONTROL PANEL
+
+        // CHANGE OF COST
+
+        if (e.getSource() == changeOfCostBackButton) {
+            ChangeOfCostVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == changeOfCostRowBack) {
+            if (changeOfCostInt > 0) {
+                changeOfCostInt--;
+            }
+            loadPageInfoForPriceCost();
+        }
+
+        if (e.getSource() == changeOfCostRowForward) {
+            if (changeOfCostInt < row.size() - 1) {
+                changeOfCostInt++;
+            }
+            loadPageInfoForPriceCost();
+        }
+
+        if (e.getSource() == changeOfCostSave) {
+            MySQL.costOfItemChange(changeOfCostRowLabel.getText(), Integer.parseInt(changeOfCostPriceLabel.getText().replace("$", "")));
+        }
+
+        if (e.getSource() == changeOfCostPriceBack) {
+            if (changeOfCostPriceLabel.getText().equals("$2")) {
+                changeOfCostPriceLabel.setText("$1");
+            }
+        }
+
+        if (e.getSource() == changeOfCostPriceForward) {
+            if (changeOfCostPriceLabel.getText().equals("$1")) {
+                changeOfCostPriceLabel.setText("$2");
+            }
         }
 
     }
