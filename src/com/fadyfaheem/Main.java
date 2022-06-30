@@ -14,7 +14,10 @@ import java.util.ArrayList;
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
-    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel, adminPasscodeLabel, adminPageLabel, changeOfCostRowLabel, changeOfCostPriceLabel;
+    private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel,
+            adminPasscodeLabel, adminPageLabel,
+            changeOfCostRowLabel, changeOfCostPriceLabel,
+            updateAllItemNumLabel;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
             eButton, numOneButton, numTwoButton, // MAIN SCREEN
             numThreeButton, numFourButton, numFiveButton, // MAIN SCREEN
@@ -26,23 +29,23 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             adminClearButton, adminZeroButton, adminEnterButton, adminBackButton, // ADMIN LOGIN
             adminOptionOne, adminOptionTwo, adminOptionThree, adminOptionFour, // ADMIN CONTROL
             adminOptionFive, adminControlBack, adminPageBack, adminPageForward, // ADMIN CONTROL
-
             changeOfCostRowBack, changeOfCostRowForward, changeOfCostPriceForward, // CHANGE OF COST
-
-            changeOfCostPriceBack, changeOfCostSave, changeOfCostBackButton; // CHANGE OF COST
+            changeOfCostPriceBack, changeOfCostSave, changeOfCostBackButton, // CHANGE OF COST
+            updateAllItemNumBack, updateAllItemNumForward, updateAllItemBackButton, updateAllItemSave;
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
     private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Create new Item", "Change Item Using Row", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password"};
 
     private int onPageNum = 0;
+    private int itemAllUpdateInt = 0;
 
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
 
     private final ArrayList<JButton> adminMenuButtons = new ArrayList<>();
 
     private int changeOfCostInt = 0;
-    private ArrayList<String> row;
+    private final ArrayList<String> row;
     private String adminPass = "";
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
@@ -282,11 +285,32 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         changeOfCostSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
         mainWindow.add(changeOfCostSave);
 
+        // END OF CHANGE COST
+
+        // UPDATE ALL ITEM AMOUNT
+
+        updateAllItemNumBack = GUI.buttonSetup("←", 100, 175, 750, 200,200,this, true);
+        mainWindow.add(updateAllItemNumBack);
+
+        updateAllItemNumForward = GUI.buttonSetup("→", 100, 725, 750, 200,200,this, true);
+        mainWindow.add(updateAllItemNumForward);
+
+        updateAllItemBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(updateAllItemBackButton);
+
+        updateAllItemNumLabel = GUI.labelSetup("##", 100, 400, 750, 300,200, true);
+        mainWindow.add(updateAllItemNumLabel);
+
+        updateAllItemSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(updateAllItemSave);
+
+
 
         //mainScreenVisibility(false);
         adminLoginVisibility(false);
         adminControlPanelVisibility(false);
         ChangeOfCostVisibility(false);
+        UpdateAllItemVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -399,6 +423,14 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         changeOfCostSave.setVisible(isVisible);
     }
 
+    public void UpdateAllItemVisibility(boolean isVisible) {
+        updateAllItemNumBack.setVisible(isVisible);
+        updateAllItemNumForward.setVisible(isVisible);
+        updateAllItemBackButton.setVisible(isVisible);
+        updateAllItemNumLabel.setVisible(isVisible);
+        updateAllItemSave.setVisible(isVisible);
+    }
+
 
     public void vendingPendingVisibility(){
         vendingPendingLabel.setVisible(true);
@@ -409,7 +441,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         Timer countdown = new Timer(5000 ,task);
         countdown.setRepeats(false);
         countdown.start();
-
     }
 
     @Override
@@ -445,6 +476,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 adminControlPanelVisibility(false);
                 changeOfCostInt = 0;
                 loadPageInfoForPriceCost();
+                break;
+            case "Update All Item Amount":
+                UpdateAllItemVisibility(true);
+                adminControlPanelVisibility(false);
+                itemAllUpdateInt = 0;
+                updateAllItemNumLabel.setText(String.valueOf(itemAllUpdateInt));
                 break;
         }
     }
@@ -707,5 +744,27 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             }
         }
 
+        // END OF CHANGE OF COST
+
+        if (e.getSource() == updateAllItemBackButton) {
+            UpdateAllItemVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == updateAllItemNumBack) {
+            if (itemAllUpdateInt > 0) {
+                itemAllUpdateInt--;
+                updateAllItemNumLabel.setText(String.valueOf(itemAllUpdateInt));
+            }
+        }
+
+        if (e.getSource() == updateAllItemNumForward) {
+            itemAllUpdateInt++;
+            updateAllItemNumLabel.setText(String.valueOf(itemAllUpdateInt));
+        }
+
+        if(e.getSource() == updateAllItemSave) {
+            MySQL.updateAllItemAmount(itemAllUpdateInt);
+        }
     }
 }
