@@ -56,6 +56,22 @@ public class GUI extends Main {
         return button;
     }
 
+    public static JTextField textFieldSetup(String text, int colmnSize, int fontSize, int x, int y, int width, int height, boolean enabled){
+        int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE
+        int actualScreenResWidth = 1080; // CONSTANT DO NOT CHANGE
+        int screenHeight = 1920 / 3;
+        int screenWidth = 1080 / 3;
+        double fontSizeCorrection = (double) actualScreenResWidth / (double) screenWidth;
+        JTextField newTextField = new JTextField(text, colmnSize);
+        double tmp_x = (double)screenWidth*((double) x)/((double)actualScreenResWidth);
+        double tmp_y = (double) screenHeight * ((double) y / (double) actualScreenResHeight);
+        double tmp_w = (double) screenWidth * ((double) width / (double) actualScreenResWidth);
+        double tmp_h = (double) screenHeight * ((double) height / (double) actualScreenResHeight);
+        newTextField.setBounds((int)tmp_x,(int)tmp_y,(int)tmp_w,(int)tmp_h);
+        newTextField.setFont(new Font("Myriad", Font.PLAIN, (int)(fontSize / fontSizeCorrection)));
+        newTextField.setEnabled(enabled);
+        return newTextField;
+    }
 
     public static JLabel labelSetup(String text, int fontSize, int x, int y, int width, int height, boolean enabled){
         int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE

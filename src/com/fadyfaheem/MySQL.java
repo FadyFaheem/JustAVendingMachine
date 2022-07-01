@@ -81,10 +81,6 @@ public class MySQL {
         }
     }
 
-    public static void changeItemUsingRowName(String row, int amountOfItemsInRow, int relayLineNum, int itemCost, String itemName) {
-    }
-
-
     public static boolean doesRowExist(String rowStr) {
         String sql = "SELECT machineRows.row FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
         try {
@@ -244,6 +240,22 @@ public class MySQL {
             for (String row : rowName) {
                 updateItemAmount(row, itemAmount);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public static String getItemNameInRow(String rowStr) {
+        String sql = "SELECT machineRows.nameOfItemSold FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            String itemName = "";
+            while (rs.next()) {
+                itemName = rs.getString("nameOfItemSold");
+            }
+            return itemName;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
