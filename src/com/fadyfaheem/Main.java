@@ -18,7 +18,10 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             adminPasscodeLabel, adminPageLabel,
             changeOfCostRowLabel, changeOfCostPriceLabel,
             updateAllItemNumLabel,
-            updateItemRowLabel, updateItemNumLabel;
+            updateItemRowLabel, updateItemNumLabel,
+            updateItemNameRowLabel;
+
+    private JTextField updateItemNameTextField;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
             eButton, numOneButton, numTwoButton, // MAIN SCREEN
             numThreeButton, numFourButton, numFiveButton, // MAIN SCREEN
@@ -33,15 +36,20 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             changeOfCostRowBack, changeOfCostRowForward, changeOfCostPriceForward, // CHANGE OF COST
             changeOfCostPriceBack, changeOfCostSave, changeOfCostBackButton, // CHANGE OF COST
             updateAllItemNumBack, updateAllItemNumForward, updateAllItemBackButton, updateAllItemSave, // CHANGE ALL ITEM
-            updateItemNumRowBack, updateItemNumRowForward, updateItemNumBack, updateItemNumForward, updateItemNumSave, updateItemNumBackButton;
+            updateItemNumRowBack, updateItemNumRowForward, updateItemNumBack,  // CHANGE SINGLE ITEM AMOUNT
+            updateItemNumForward, updateItemNumSave, updateItemNumBackButton, // CHANGE SINGLE ITEM AMOUNT
+            updateItemNameRowBack, updateItemNameRowForward, updateItemNameSave, updateItemNameBackButton;
+
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Create new Item", "Change Item Using Row", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password"};
+    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password"};
 
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
     private int itemAmountIntRow = 0;
+
+    private int itemNameRowInt = 0;
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
 
     private final ArrayList<JButton> adminMenuButtons = new ArrayList<>();
@@ -334,6 +342,32 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateItemNumSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
         mainWindow.add(updateItemNumSave);
 
+        // END OF UPDATE ITEM AMOUNT
+
+        // UPDATE ITEM NAME
+
+        updateItemNameBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(updateItemNameBackButton);
+
+        updateItemNameRowBack = GUI.buttonSetup("←", 100, 175, 500, 200,200,this, true);
+        mainWindow.add(updateItemNameRowBack);
+
+        updateItemNameRowForward = GUI.buttonSetup("→", 100, 725, 500, 200,200,this, true);
+        mainWindow.add(updateItemNameRowForward);
+
+        updateItemNameSave = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(updateItemNameSave);
+
+        updateItemNameRowLabel = GUI.labelSetup("###", 100, 400, 500, 300,200, true);
+        mainWindow.add(updateItemNameRowLabel);
+
+        updateItemNameTextField = GUI.textFieldSetup("####",1,60,155,1000,800,150, true);
+        mainWindow.add(updateItemNameTextField);
+
+
+
+
+
 
 
         //mainScreenVisibility(false);
@@ -342,6 +376,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ChangeOfCostVisibility(false);
         UpdateAllItemVisibility(false);
         UpdateItemAmountVisibility(false);
+        UpdateItemNameVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -473,6 +508,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateItemNumSave.setVisible(isVisible);
     }
 
+    public void UpdateItemNameVisibility(boolean isVisible) {
+        updateItemNameTextField.setVisible(isVisible);
+        updateItemNameRowLabel.setVisible(isVisible);
+        updateItemNameBackButton.setVisible(isVisible);
+        updateItemNameRowBack.setVisible(isVisible);
+        updateItemNameRowForward.setVisible(isVisible);
+        updateItemNameSave.setVisible(isVisible);
+    }
+
+
 
     public void vendingPendingVisibility(){
         vendingPendingLabel.setVisible(true);
@@ -531,6 +576,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 itemAmountIntRow = 0;
                 loadPageForItemAmount();
                 break;
+            case "Update Item Name":
+                UpdateItemNameVisibility(true);
+                adminControlPanelVisibility(false);
+                itemNameRowInt = 0;
+                loadPageForItemName();
+                break;
         }
     }
 
@@ -542,6 +593,11 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public void loadPageForItemAmount() {
         updateItemRowLabel.setText(row.get(itemAmountIntRow));
         updateItemNumLabel.setText(MySQL.amountOfItemsInRow(row.get(itemAmountIntRow)) + "");
+    }
+
+    public void loadPageForItemName() {
+        updateItemNameRowLabel.setText(row.get(itemNameRowInt));
+        updateItemNameTextField.setText(MySQL.getItemNameInRow(row.get(itemNameRowInt)));
     }
 
     public void adminPageLoad() {
@@ -857,5 +913,36 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 updateItemNumLabel.setText(String.valueOf(Integer.parseInt(updateItemNumLabel.getText()) - 1));
             }
         }
+
+        // END OF ITEM AMOUNT
+
+        // ITEM NAME
+
+        if (e.getSource() == updateItemNameBackButton) {
+            UpdateItemNameVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == updateItemNameRowBack) {
+            if (itemNameRowInt > 0) {
+                itemNameRowInt--;
+                loadPageForItemName();
+            }
+        }
+
+        if(e.getSource() == updateItemNameRowForward) {
+            if (itemNameRowInt < row.size() - 1) {
+                itemNameRowInt++;
+                loadPageForItemName();
+            }
+        }
+
+        if (e.getSource() == updateItemNameSave) {
+            if (updateItemNameTextField.getText().length() > 0) {
+                MySQL.updateItemNameInRow(updateItemNameRowLabel.getText(), updateItemNameTextField.getText());
+            }
+        }
+
+
     }
 }
