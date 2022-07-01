@@ -7,11 +7,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class GUI extends Main {
+    static int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE
+    static int actualScreenResWidth = 1080; // CONSTANT DO NOT CHANGE
+    static int screenHeight = 1920 / 3;
+    static int screenWidth = 1080 / 3;
     public static JButton buttonSetup(String buttonText, int fontSize, int x, int y, int width, int height, ActionListener listener, boolean enabled){
-        int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE
-        int actualScreenResWidth = 1080; // CONSTANT DO NOT CHANGE
-        int screenHeight = 1920 / 3;
-        int screenWidth = 1080 / 3;
         JButton button = new JButton();
         button.setText(buttonText); // sets Button Text
         double tmp_x = (double)screenWidth * ((double) x)/((double)actualScreenResWidth);
@@ -57,10 +57,6 @@ public class GUI extends Main {
     }
 
     public static JTextField textFieldSetup(String text, int colmnSize, int fontSize, int x, int y, int width, int height, boolean enabled){
-        int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE
-        int actualScreenResWidth = 1080; // CONSTANT DO NOT CHANGE
-        int screenHeight = 1920 / 3;
-        int screenWidth = 1080 / 3;
         double fontSizeCorrection = (double) actualScreenResWidth / (double) screenWidth;
         JTextField newTextField = new JTextField(text, colmnSize);
         double tmp_x = (double)screenWidth*((double) x)/((double)actualScreenResWidth);
@@ -74,10 +70,6 @@ public class GUI extends Main {
     }
 
     public static JLabel labelSetup(String text, int fontSize, int x, int y, int width, int height, boolean enabled){
-        int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE
-        int actualScreenResWidth = 1080; // CONSTANT DO NOT CHANGE
-        int screenHeight = 1920 / 3;
-        int screenWidth = 1080 / 3;
         double fontSizeCorrection = (double) actualScreenResWidth / (double) screenWidth;
         JLabel newLabel = new JLabel(text, SwingConstants.CENTER);
         double tmp_x = (double)screenWidth*((double) x)/((double)actualScreenResWidth);
