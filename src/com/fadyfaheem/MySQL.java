@@ -127,6 +127,21 @@ public class MySQL {
         Mail.sendMail("flancearebuilder@gmail.com", ("There are Items missing within the machine. The items include: " + itemsMissing));
     }
 
+    public static void areAllReqMetToSendEmail() { // Must be a bool func
+    }
+
+    public static void getReceiverEmail() { // Must be string func
+
+    }
+
+    public static void getSenderEmail() { // Must be string func
+
+    }
+
+    public static void getSenderPassword() { // Must be string func
+
+    }
+
     public static boolean doesAdminPassExist() {
         String adminHash = "";
         String sqlOne = "SELECT * FROM vendingMachine.settings where settings.name = 'adminHash'";
