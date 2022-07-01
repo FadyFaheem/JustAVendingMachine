@@ -112,6 +112,21 @@ public class MySQL {
         }
     }
 
+    public static void listAllItemsThatAreEmpty() {
+        String sql = "SELECT * FROM vendingMachine.machineRows where machineRows.amountOfItemsInRow = 0";
+        ArrayList<String> itemsMissing = new ArrayList<>();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                itemsMissing.add(rs.getString("nameOfItemSold"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        Mail.sendMail("flancearebuilder@gmail.com", ("There are Items missing within the machine. The items include: " + itemsMissing));
+    }
+
     public static boolean doesAdminPassExist() {
         String adminHash = "";
         String sqlOne = "SELECT * FROM vendingMachine.settings where settings.name = 'adminHash'";

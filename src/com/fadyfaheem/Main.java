@@ -43,7 +43,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password"};
+    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password", "Change Sending Email", "Change Email Receiver", "Send Test Email"};
 
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
@@ -66,6 +66,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         //BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
+        addDollarBill();
         addDollarBill();
         row = MySQL.rowList();
     }
@@ -400,7 +401,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             } else {
                 selectLabel.setForeground(Color.red);
             }
-
         }
     }
 
@@ -679,6 +679,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                         moneyCounterLabel.setText("$" + dollarAvailable);
                         MySQL.activateMotorForRow(selectionString);
                         MySQL.removeBoughtItem(selectionString);
+                        if (!MySQL.doesRowHaveItems(selectionString)) {
+                            MySQL.listAllItemsThatAreEmpty();
+                        }
                         clearSelect();
                         mainScreenVisibility(false);
                         vendingPendingVisibility();
