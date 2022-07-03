@@ -225,14 +225,38 @@ public class MySQL {
         return locationOfMachine;
     }
 
-    public static void setReceiverEmail(String email) {}
+    public static void setOptions(String settingName, String value) {
+        String sql = "SELECT * FROM vendingMachine.settings where settings.name = '" + settingName + "'";
+        int counter = 0;
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                counter++;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
-    public static void setSenderEmail(String email) {}
-
-    public static void setSenderPassword(String pass) {}
-
-    public static void setMachineLocation(String location) {}
-
+        if (counter == 0) {
+           String sqlTwo = "INSERT IGNORE INTO `vendingMachine`.`settings` (`name`, `value`) VALUES ('" + settingName + "', '" + value + "')";
+            try {
+                Statement stmt = connection.createStatement();
+                stmt.execute(sql);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            String updateSQL = "UPDATE `vendingMachine`.`settings` SET `value` = '" + value + "' WHERE (`name` = '" + settingName + "')";
+            PreparedStatement exstmt;
+            try {
+                exstmt = connection.prepareStatement(updateSQL);
+                exstmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     public static boolean doesAdminPassExist() {
         String adminHash = "";

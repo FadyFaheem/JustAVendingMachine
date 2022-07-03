@@ -365,7 +365,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateItemNameTextField = GUI.textFieldSetup("####",1,60,155,1000,800,150, true);
         mainWindow.add(updateItemNameTextField);
 
-
+        // END OF UPDATE ITEM NAME
 
 
 
