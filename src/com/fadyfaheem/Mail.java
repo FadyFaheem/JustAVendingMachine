@@ -16,8 +16,8 @@ public class Mail {
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
-        String email = "thevendingmachineone@gmail.com";
-        String password = "otwjmwyrvkvfbhhb";
+        String email = MySQL.getSenderEmail();
+        String password = MySQL.getSenderPassword();
 
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
@@ -33,12 +33,13 @@ public class Mail {
         // it's honestly slightly absurd. It takes almost 4 secs to send an email.
         emailExecutor.execute(() -> {
             try {
-                Transport.send(message);
+                if (MySQL.areAllReqMetToSendEmail()) {
+                    Transport.send(message);
+                }
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
             }
         });
-
 
     }
 
@@ -47,7 +48,7 @@ public class Mail {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(machineEmail));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(receiverEmail));
-            message.setSubject("Regarding Vending Machine at Local Location");
+            message.setSubject("Regarding Vending Machine at " + MySQL.getLocationForEmail());
             message.setText(body);
             return message;
         } catch (MessagingException e) {

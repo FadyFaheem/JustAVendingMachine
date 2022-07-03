@@ -43,7 +43,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password", "Change Sending Email", "Change Email Receiver", "Send Test Email"};
+    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password", "Change Machine Location", "Change Sending Email", "Change Email Receiver", "Send Test Email"};
 
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
