@@ -21,7 +21,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateItemRowLabel, updateItemNumLabel,
             updateItemNameRowLabel;
 
-    private JTextField updateItemNameTextField;
+    private JTextField updateItemNameTextField, changeLocationTextField, changeSendingEmailTextField, changeSendingPassTextField, changeReceivingEmailTextField;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
             eButton, numOneButton, numTwoButton, // MAIN SCREEN
             numThreeButton, numFourButton, numFiveButton, // MAIN SCREEN
@@ -38,12 +38,17 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateAllItemNumBack, updateAllItemNumForward, updateAllItemBackButton, updateAllItemSave, // CHANGE ALL ITEM
             updateItemNumRowBack, updateItemNumRowForward, updateItemNumBack,  // CHANGE SINGLE ITEM AMOUNT
             updateItemNumForward, updateItemNumSave, updateItemNumBackButton, // CHANGE SINGLE ITEM AMOUNT
-            updateItemNameRowBack, updateItemNameRowForward, updateItemNameSave, updateItemNameBackButton;
+            updateItemNameRowBack, updateItemNameRowForward, updateItemNameSave, updateItemNameBackButton,
+            changeLocationBackButton, changeLocationSaveButton,
+            changeSendingEmailSaveButton, changeSendingEmailBackButton,
+            changeReceivingEmailBackButton, changeReceivingEmailSaveButton,
+            changeSendingPasswordSaveButton, changeSendingPasswordBackButton,
+            sendTestEmailNoButton, sendTestEmailYesButton;
 
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password", "Change Machine Location", "Change Sending Email", "Change Email Receiver", "Send Test Email"};
+    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password", "Change Machine Location", "Change Sending Email", "Change Sending Password", "Change Email Receiver", "Send Test Email"};
 
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
