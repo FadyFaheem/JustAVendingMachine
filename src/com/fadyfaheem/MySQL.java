@@ -124,23 +124,115 @@ public class MySQL {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        Mail.sendMail("flancearebuilder@gmail.com", ("There are Items missing within the machine. The items include: " + itemsMissing));
+        Mail.sendMail(getReceiverEmail(), ("There are Items missing within the machine. The items include: " + itemsMissing));
     }
 
-    public static void areAllReqMetToSendEmail() { // Must be a bool func
+    public static boolean areAllReqMetToSendEmail() { // Must be a bool func
+        String sql = "SELECT * FROM vendingMachine.settings where settings.name = 'receiverEmail'";
+        String sqlTwo = "SELECT * FROM vendingMachine.settings where settings.name = 'senderEmail'";
+        String sqlThree = "SELECT * FROM vendingMachine.settings where settings.name = 'senderPassword'";
+        String sqlFour = "SELECT * FROM vendingMachine.settings where settings.name = 'locationOfMachine'";
+        String recEmail = "";
+        String sendEmail = "";
+        String sendPass = "";
+        String locationOfMachine = "";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            Statement stmtTwo = connection.createStatement();
+            ResultSet rsTwo = stmtTwo.executeQuery(sqlTwo);
+            Statement stmtThree = connection.createStatement();
+            ResultSet rsThree = stmtThree.executeQuery(sqlThree);
+            Statement stmtFour = connection.createStatement();
+            ResultSet rsFour = stmtFour.executeQuery(sqlFour);
+            while (rs.next()) {
+                recEmail = rs.getString("value");
+            }
+            while (rsTwo.next()) {
+                sendEmail = rsTwo.getString("value");
+            }
+            while (rsThree.next()) {
+                sendPass = rsThree.getString("value");
+            }
+            while (rsFour.next()) {
+                locationOfMachine = rsFour.getString("value");
+            }
+
+            return (locationOfMachine.length() >= 4) && (sendPass.length() >= 5) && (sendEmail.length() >= 8) && (recEmail.length() >= 5);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
-    public static void getReceiverEmail() { // Must be string func
-
+    public static String getReceiverEmail() { // Must be string func
+        String sql = "SELECT * FROM vendingMachine.settings where settings.name = 'receiverEmail'";
+        String email = "";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                email = rs.getString("value");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return email;
     }
 
-    public static void getSenderEmail() { // Must be string func
-
+    public static String getSenderEmail() { // Must be string func
+        String sql = "SELECT * FROM vendingMachine.settings where settings.name = 'senderEmail'";
+        String email = "";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                email = rs.getString("value");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return email;
     }
 
-    public static void getSenderPassword() { // Must be string func
-
+    public static String getSenderPassword() { // Must be string func
+        String sql = "SELECT * FROM vendingMachine.settings where settings.name = 'senderPassword'";
+        String pass = "";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                pass = rs.getString("value");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return pass;
     }
+
+    public static String getLocationForEmail() {
+        String sql = "SELECT * FROM vendingMachine.settings where settings.name = 'locationOfMachine'";
+        String locationOfMachine = "";
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                locationOfMachine = rs.getString("value");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return locationOfMachine;
+    }
+
+    public static void setReceiverEmail(String email) {}
+
+    public static void setSenderEmail(String email) {}
+
+    public static void setSenderPassword(String pass) {}
+
+    public static void setMachineLocation(String location) {}
+
 
     public static boolean doesAdminPassExist() {
         String adminHash = "";
@@ -157,7 +249,6 @@ public class MySQL {
         return adminHash.length() > 1;
 
     }
-
 
     public static void createAdminPass(String pass) {
         try {
