@@ -40,6 +40,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateItemNumRowBack, updateItemNumRowForward, updateItemNumBack,  // CHANGE SINGLE ITEM AMOUNT
             updateItemNumForward, updateItemNumSave, updateItemNumBackButton, // CHANGE SINGLE ITEM AMOUNT
             updateItemNameRowBack, updateItemNameRowForward, updateItemNameSave, updateItemNameBackButton,
+
             changeLocationBackButton, changeLocationSaveButton,
             changeSendingEmailSaveButton, changeSendingEmailBackButton,
             changeReceivingEmailBackButton, changeReceivingEmailSaveButton,
@@ -49,7 +50,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int dollarAvailable = 0; // Used for keeping dollars inputted for consumer
     private int adminSwitch = 0;
 
-    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line", "Change Admin Password", "Change Machine Location", "Change Sending Email", "Change Sending Password", "Change Email Receiver", "Send Test Email"};
+    private final String[] adminMenuOptions = {"Change Cost of Item", "Update All Item Amount", "Update Item Amount", "Update Item Name", "Update All Item Name", "Change Relay Line NOT FINISHED", "Change Admin Password", "Change Machine Location", "Change Sending Email", "Change Sending Password", "Change Email Receiver", "Send Test Email"};
 
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
@@ -589,6 +590,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 itemNameRowInt = 0;
                 loadPageForItemName();
                 break;
+            case "Change Admin Password":
+                adminControlPanelVisibility(false);
+                adminLoginVisibility(true);
+                MySQL.dropAdminPass();
+                adminPass = "";
+                adminPassCodeLabelSet();
         }
     }
 

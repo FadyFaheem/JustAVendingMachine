@@ -274,6 +274,17 @@ public class MySQL {
 
     }
 
+    public static void dropAdminPass() {
+        String sql = "DELETE FROM `vendingMachine`.`settings` WHERE (`name` = 'adminHash')";
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public static void createAdminPass(String pass) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
