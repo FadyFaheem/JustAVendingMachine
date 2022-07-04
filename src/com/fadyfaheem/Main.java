@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 
@@ -74,6 +75,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         addDollarBill();
         addDollarBill();
         row = MySQL.rowList();
+        System.out.println("TESTING BUILD");
     }
 
     public void appendAdminMenuButtons() {
