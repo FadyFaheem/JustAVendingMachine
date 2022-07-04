@@ -19,7 +19,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             changeOfCostRowLabel, changeOfCostPriceLabel,
             updateAllItemNumLabel,
             updateItemRowLabel, updateItemNumLabel,
-            updateItemNameRowLabel;
+            updateItemNameRowLabel,
+            changeRelayLineRowLabel, changeRelayLineNumLabel;
 
     private JTextField updateItemNameTextField, changeLocationTextField, changeSendingEmailTextField, changeSendingPassTextField, changeReceivingEmailTextField;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
@@ -39,6 +40,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateItemNumRowBack, updateItemNumRowForward, updateItemNumBack,  // CHANGE SINGLE ITEM AMOUNT
             updateItemNumForward, updateItemNumSave, updateItemNumBackButton, // CHANGE SINGLE ITEM AMOUNT
             updateItemNameRowBack, updateItemNameRowForward, updateItemNameSave, updateItemNameBackButton,
+            changeRelayLineBackButton, changeRelayLineRowBack, changeRelayLineRowForward,
+            changeRelayLineNumBack, changeRelayLineNumForward, changeRelayLineSave, changeRelayLineTest,
             changeLocationBackButton, changeLocationSaveButton,
             changeSendingEmailSaveButton, changeSendingEmailBackButton,
             changeReceivingEmailBackButton, changeReceivingEmailSaveButton,
@@ -53,7 +56,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int onPageNum = 0;
     private int itemAllUpdateInt = 0;
     private int itemAmountIntRow = 0;
-
+    private int relayLineNumInt = 0;
     private int itemNameRowInt = 0;
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
 
@@ -372,6 +375,37 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         // END OF UPDATE ITEM NAME
 
+        // CHANGE RELAY LINE
+
+        changeRelayLineBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(changeRelayLineBackButton);
+
+        changeRelayLineRowBack = GUI.buttonSetup("←", 100, 175, 500, 200,200,this, true);
+        mainWindow.add(changeRelayLineRowBack);
+
+        changeRelayLineRowForward = GUI.buttonSetup("→", 100, 725, 500, 200,200,this, true);
+        mainWindow.add(changeRelayLineRowForward);
+
+        changeRelayLineSave = GUI.buttonSetup("Save", 100, 350,1550,400, 200,this,true);
+        mainWindow.add(changeRelayLineSave);
+
+        changeRelayLineTest = GUI.buttonSetup("Test", 100, 350,1300,400, 200,this,true);
+        mainWindow.add(changeRelayLineTest);
+
+        changeRelayLineRowLabel = GUI.labelSetup("###", 100, 400, 500, 300,200, true);
+        mainWindow.add(changeRelayLineRowLabel);
+
+        changeRelayLineNumLabel = GUI.labelSetup("1", 100, 400, 1000, 300,200, true);
+        mainWindow.add(changeRelayLineNumLabel);
+
+        changeRelayLineNumBack = GUI.buttonSetup("←", 100, 175, 1000, 200,200,this, true);
+        mainWindow.add(changeRelayLineNumBack);
+
+        changeRelayLineNumForward = GUI.buttonSetup("→", 100, 725, 1000, 200,200,this, true);
+        mainWindow.add(changeRelayLineNumForward);
+
+        // END OF CHANGE RELAY LINE
+
 
 
 
@@ -383,6 +417,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         UpdateAllItemVisibility(false);
         UpdateItemAmountVisibility(false);
         UpdateItemNameVisibility(false);
+        ChangeRelayLineVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -522,6 +557,18 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         updateItemNameSave.setVisible(isVisible);
     }
 
+    public void ChangeRelayLineVisibility(boolean isVisible) {
+        changeRelayLineTest.setVisible(isVisible);
+        changeRelayLineBackButton.setVisible(isVisible);
+        changeRelayLineRowBack.setVisible(isVisible);
+        changeRelayLineRowForward.setVisible(isVisible);
+        changeRelayLineSave.setVisible(isVisible);
+        changeRelayLineRowLabel.setVisible(isVisible);
+        changeRelayLineNumLabel.setVisible(isVisible);
+        changeRelayLineNumBack.setVisible(isVisible);
+        changeRelayLineNumForward.setVisible(isVisible);
+    }
+
 
 
     public void vendingPendingVisibility(){
@@ -594,6 +641,11 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 adminPass = "";
                 adminPassCodeLabelSet();
                 break;
+            case "Change Relay Line":
+                ChangeRelayLineVisibility(true);
+                adminControlPanelVisibility(false);
+                loadPageForRelayLine();
+                break;
         }
     }
 
@@ -610,6 +662,11 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public void loadPageForItemName() {
         updateItemNameRowLabel.setText(row.get(itemNameRowInt));
         updateItemNameTextField.setText(MySQL.getItemNameInRow(row.get(itemNameRowInt)));
+    }
+
+    public void loadPageForRelayLine() {
+        changeRelayLineRowLabel.setText(row.get(relayLineNumInt));
+        changeRelayLineNumLabel.setText(String.valueOf(MySQL.getRelayLineNum(row.get(relayLineNumInt))));
     }
 
     public void adminPageLoad() {
@@ -958,6 +1015,53 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             }
         }
 
+        // END OF UPDATE ITEM NAME
+
+        // CHANGE RELAY LINE
+        if (e.getSource() == changeRelayLineBackButton) {
+            ChangeRelayLineVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if(e.getSource() == changeRelayLineRowBack) {
+            if (relayLineNumInt > 0) {
+                relayLineNumInt--;
+                loadPageForRelayLine();
+            }
+        }
+
+        if (e.getSource() == changeRelayLineRowForward) {
+            if (relayLineNumInt < row.size() - 1) {
+                relayLineNumInt++;
+                loadPageForRelayLine();
+            }
+        }
+
+        if (e.getSource() == changeRelayLineNumBack) {
+            if (Integer.parseInt(changeRelayLineNumLabel.getText()) > 0) {
+                changeRelayLineNumLabel.setText(String.valueOf(Integer.parseInt(changeRelayLineNumLabel.getText()) - 1));
+            }
+        }
+
+        if (e.getSource() == changeRelayLineNumForward) {
+            changeRelayLineNumLabel.setText(String.valueOf(Integer.parseInt(changeRelayLineNumLabel.getText()) + 1));
+        }
+
+        if (e.getSource() == changeRelayLineSave) {
+            System.out.println("This happened" + changeRelayLineRowLabel.getText() + changeRelayLineNumLabel.getText());
+            MySQL.changeRelayLineNum(changeRelayLineRowLabel.getText(), Integer.parseInt(changeRelayLineNumLabel.getText()));
+        }
+
+        if (e.getSource() == changeRelayLineTest) {
+            changeRelayLineTest.setEnabled(false);
+            ArduinoConnection.arduinoWrite(changeRelayLineNumLabel.getText());
+            ActionListener task = evt -> {
+                changeRelayLineTest.setEnabled(true);
+            };
+            Timer countdown = new Timer(5000 ,task);
+            countdown.setRepeats(false);
+            countdown.start();
+        }
 
     }
 }

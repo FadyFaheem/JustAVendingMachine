@@ -502,7 +502,29 @@ public class MySQL {
     }
 
     public static void changeRelayLineNum (String rowStr, int relayLineNum) {
+        String updateSQL = "UPDATE `vendingMachine`.`machineRows` SET `relayLineNum` = '" + relayLineNum + "' WHERE (`row` = '"+ rowStr +"')";
+        PreparedStatement exstmt;
+        try {
+            exstmt = connection.prepareStatement(updateSQL);
+            exstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public static int getRelayLineNum(String rowStr) {
+        String sql = "SELECT machineRows.relayLineNum FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
+        int relayLineNum = 0;
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                relayLineNum = rs.getInt("relayLineNum");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return relayLineNum;
     }
 
     public static void activateMotorForRow(String rowStr) {
