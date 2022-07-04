@@ -406,7 +406,27 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         // END OF CHANGE RELAY LINE
 
+        // Change Location
+        changeLocationBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(changeLocationBackButton);
 
+        changeLocationSaveButton = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(changeLocationSaveButton);
+
+        changeLocationTextField = GUI.textFieldSetup("####",1,60,155,750,800,150, true);
+        mainWindow.add(changeLocationTextField);
+
+        // END OF CHANGE LOCATION
+
+        // Sender Email
+        changeSendingEmailBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(changeSendingEmailBackButton);
+
+        changeSendingEmailSaveButton = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(changeSendingEmailSaveButton);
+
+        changeSendingEmailTextField = GUI.textFieldSetup("####",1,40,155,750,800,150, true);
+        mainWindow.add(changeSendingEmailTextField);
 
 
 
@@ -418,6 +438,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         UpdateItemAmountVisibility(false);
         UpdateItemNameVisibility(false);
         ChangeRelayLineVisibility(false);
+        ChangeLocationNameVisibility(false);
+        ChangeSendingEmailVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -569,6 +591,18 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         changeRelayLineNumForward.setVisible(isVisible);
     }
 
+    public void ChangeLocationNameVisibility(boolean isVisible) {
+        changeLocationTextField.setVisible(isVisible);
+        changeLocationSaveButton.setVisible(isVisible);
+        changeLocationBackButton.setVisible(isVisible);
+    }
+
+    public void ChangeSendingEmailVisibility(boolean isVisible) {
+        changeSendingEmailBackButton.setVisible(isVisible);
+        changeSendingEmailSaveButton.setVisible(isVisible);
+        changeSendingEmailTextField.setVisible(isVisible);
+    }
+
 
 
     public void vendingPendingVisibility(){
@@ -645,6 +679,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 ChangeRelayLineVisibility(true);
                 adminControlPanelVisibility(false);
                 loadPageForRelayLine();
+                break;
+            case "Change Machine Location":
+                ChangeLocationNameVisibility(true);
+                adminControlPanelVisibility(false);
+                changeLocationTextField.setText(MySQL.getLocationForEmail());
+                break;
+            case "Change Sending Email":
+                adminControlPanelVisibility(false);
+                ChangeSendingEmailVisibility(true);
+                changeSendingEmailTextField.setText(MySQL.getSenderEmail());
                 break;
         }
     }
@@ -1055,12 +1099,36 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         if (e.getSource() == changeRelayLineTest) {
             changeRelayLineTest.setEnabled(false);
             ArduinoConnection.arduinoWrite(changeRelayLineNumLabel.getText());
-            ActionListener task = evt -> {
-                changeRelayLineTest.setEnabled(true);
-            };
+            ActionListener task = evt -> changeRelayLineTest.setEnabled(true);
             Timer countdown = new Timer(5000 ,task);
             countdown.setRepeats(false);
             countdown.start();
+        }
+
+        // END OF RELAY LINE
+
+        // CHANGE MACHINE LOCATION
+
+        if (e.getSource() == changeLocationBackButton) {
+            ChangeLocationNameVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == changeLocationSaveButton) {
+            MySQL.setOptions("locationOfMachine", changeLocationTextField.getText());
+        }
+
+        // END OF CHANGE MACHINE LOCATION
+
+        // CHANGE SENDING EMAIL
+
+        if (e.getSource() == changeSendingEmailBackButton) {
+            ChangeSendingEmailVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == changeSendingEmailSaveButton) {
+            MySQL.setOptions("senderEmail", changeSendingEmailTextField.getText());
         }
 
     }
