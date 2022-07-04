@@ -587,6 +587,13 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 itemNameRowInt = 0;
                 loadPageForItemName();
                 break;
+            case "Change Admin Password":
+                adminControlPanelVisibility(false);
+                adminLoginVisibility(true);
+                MySQL.dropAdminPass();
+                adminPass = "";
+                adminPassCodeLabelSet();
+                break;
         }
     }
 
