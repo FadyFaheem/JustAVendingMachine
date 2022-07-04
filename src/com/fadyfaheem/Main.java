@@ -84,7 +84,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminMenuButtons.add(adminOptionFive);
     }
 
-    public static void showOnScreen( int screen, JFrame frame )
+    public static void showOnScreen( int screen, JFrame frame ) // Full Screens automatically to screen
     {
         GraphicsEnvironment ge = GraphicsEnvironment
                 .getLocalGraphicsEnvironment();
