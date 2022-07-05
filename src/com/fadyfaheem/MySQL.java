@@ -158,7 +158,7 @@ public class MySQL {
                 locationOfMachine = rsFour.getString("value");
             }
 
-            return (locationOfMachine.length() >= 4) && (sendPass.length() >= 5) && (sendEmail.length() >= 8) && (recEmail.length() >= 5);
+            return (locationOfMachine.length() >= 1) && (sendPass.length() >= 5) && (sendEmail.length() >= 5) && (recEmail.length() >= 5);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

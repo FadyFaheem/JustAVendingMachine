@@ -20,7 +20,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateAllItemNumLabel,
             updateItemRowLabel, updateItemNumLabel,
             updateItemNameRowLabel,
-            changeRelayLineRowLabel, changeRelayLineNumLabel;
+            changeRelayLineRowLabel, changeRelayLineNumLabel, sendTestEmailLabel;
 
     private JTextField updateItemNameTextField, changeLocationTextField, changeSendingEmailTextField, changeSendingPassTextField, changeReceivingEmailTextField;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
@@ -74,8 +74,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         //BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
-        addDollarBill();
-        addDollarBill();
         row = MySQL.rowList();
     }
 
@@ -428,7 +426,44 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         changeSendingEmailTextField = GUI.textFieldSetup("####",1,40,155,750,800,150, true);
         mainWindow.add(changeSendingEmailTextField);
 
+        // END OF SENDING EMAIL
 
+        // Sending Password
+
+        changeSendingPasswordBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(changeSendingPasswordBackButton);
+
+        changeSendingPasswordSaveButton = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(changeSendingPasswordSaveButton);
+
+        changeSendingPassTextField = GUI.textFieldSetup("####",1,40,155,750,800,150, true);
+        mainWindow.add(changeSendingPassTextField);
+
+        // End of Sending Password
+
+        // Receiving Email
+
+        changeReceivingEmailBackButton = GUI.buttonSetup("←", 100, 50, 50, 200,200,this, true);
+        mainWindow.add(changeReceivingEmailBackButton);
+
+        changeReceivingEmailSaveButton = GUI.buttonSetup("Save", 100, 350,1400,400, 200,this,true);
+        mainWindow.add(changeReceivingEmailSaveButton);
+
+        changeReceivingEmailTextField = GUI.textFieldSetup("####",1,40,155,750,800,150, true);
+        mainWindow.add(changeReceivingEmailTextField);
+
+        // End of Receiving Email
+
+        // Send Test Email
+
+        sendTestEmailLabel = GUI.labelSetup("Send Test Email?", 100, 150, 750, 800,150, true);
+        mainWindow.add(sendTestEmailLabel);
+
+        sendTestEmailYesButton = GUI.buttonSetup("Yes", 100, 200,1200,300, 200,this,true);
+        mainWindow.add(sendTestEmailYesButton);
+
+        sendTestEmailNoButton = GUI.buttonSetup("No", 100, 600,1200,300, 200,this,true);
+        mainWindow.add(sendTestEmailNoButton);
 
         //mainScreenVisibility(false);
         adminLoginVisibility(false);
@@ -440,6 +475,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ChangeRelayLineVisibility(false);
         ChangeLocationNameVisibility(false);
         ChangeSendingEmailVisibility(false);
+        ChangeSendingPassVisibility(false);
+        ChangeReceivingEmailVisibility(false);
+        TestEmailVisibility(false);
     }
 
     public void addLetterNumber(boolean isLetter, String LetterNumber){
@@ -538,6 +576,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminPageForward.setVisible(isVisible);
         adminPageBack.setVisible(isVisible);
         adminPageLabel.setVisible(isVisible);
+        if (isVisible) {
+            adminPageLoad();
+        }
     }
 
     public void ChangeOfCostVisibility(boolean isVisible) {
@@ -602,6 +643,25 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         changeSendingEmailSaveButton.setVisible(isVisible);
         changeSendingEmailTextField.setVisible(isVisible);
     }
+
+    public void ChangeSendingPassVisibility(boolean isVisible) {
+        changeSendingPassTextField.setVisible(isVisible);
+        changeSendingPasswordSaveButton.setVisible(isVisible);
+        changeSendingPasswordBackButton.setVisible(isVisible);
+    }
+
+    public void ChangeReceivingEmailVisibility(boolean isVisible) {
+        changeReceivingEmailTextField.setVisible(isVisible);
+        changeReceivingEmailSaveButton.setVisible(isVisible);
+        changeReceivingEmailBackButton.setVisible(isVisible);
+    }
+
+    public void TestEmailVisibility(boolean isVisible) {
+        sendTestEmailLabel.setVisible(isVisible);
+        sendTestEmailNoButton.setVisible(isVisible);
+        sendTestEmailYesButton.setVisible(isVisible);
+    }
+
 
 
 
@@ -689,6 +749,20 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 adminControlPanelVisibility(false);
                 ChangeSendingEmailVisibility(true);
                 changeSendingEmailTextField.setText(MySQL.getSenderEmail());
+                break;
+            case "Change Sending Password":
+                adminControlPanelVisibility(false);
+                ChangeSendingPassVisibility(true);
+                changeSendingPassTextField.setText("");
+                break;
+            case "Change Email Receiver":
+                adminControlPanelVisibility(false);
+                ChangeReceivingEmailVisibility(true);
+                changeReceivingEmailTextField.setText(MySQL.getReceiverEmail());
+                break;
+            case "Send Test Email":
+                adminControlPanelVisibility(false);
+                TestEmailVisibility(true);
                 break;
         }
     }
@@ -1130,6 +1204,48 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         if (e.getSource() == changeSendingEmailSaveButton) {
             MySQL.setOptions("senderEmail", changeSendingEmailTextField.getText());
         }
+
+        // END OF SENDING EMAIL
+
+        // Change of Sending Pass
+
+        if (e.getSource() == changeSendingPasswordBackButton) {
+            ChangeSendingPassVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == changeSendingPasswordSaveButton) {
+            MySQL.setOptions("senderPassword", changeSendingPassTextField.getText());
+        }
+
+        // END OF SENDING PASS
+
+        // Change of Receiving Email
+
+        if (e.getSource() == changeReceivingEmailBackButton) {
+            ChangeReceivingEmailVisibility(false);
+            adminControlPanelVisibility(true);
+        }
+
+        if (e.getSource() == changeReceivingEmailSaveButton) {
+            MySQL.setOptions("receiverEmail", changeReceivingEmailTextField.getText());
+        }
+
+        // END OF Receiving EMail
+
+        // Send Test Email
+
+        if (e.getSource() == sendTestEmailNoButton) {
+            adminControlPanelVisibility(true);
+            TestEmailVisibility(false);
+        }
+
+        if (e.getSource() == sendTestEmailYesButton) {
+            adminControlPanelVisibility(true);
+            TestEmailVisibility(false);
+            Mail.sendMail(MySQL.getReceiverEmail(), "This is a Test Email.");
+        }
+
 
     }
 }

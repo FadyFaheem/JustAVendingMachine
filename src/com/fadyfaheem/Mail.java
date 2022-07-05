@@ -48,7 +48,7 @@ public class Mail {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(machineEmail));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(receiverEmail));
-            message.setSubject("Regarding Vending Machine at " + MySQL.getLocationForEmail());
+            message.setSubject("Regarding Vending Machine Located At " + MySQL.getLocationForEmail());
             message.setText(body);
             return message;
         } catch (MessagingException e) {
