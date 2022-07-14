@@ -60,6 +60,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int itemNameRowInt = 0;
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
 
+    public ArrayList<String> imageURLS;
+    private int imageOn = 0;
     private final ArrayList<JButton> adminMenuButtons = new ArrayList<>();
 
     private int changeOfCostInt = 0;
@@ -75,6 +77,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         row = MySQL.rowList();
+        imageURLS = MySQL.getImagesLinks();
+        imgReload.setRepeats(true);
+        imgReload.start();
     }
 
     public void appendAdminMenuButtons() {
@@ -515,6 +520,17 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public void addDollarBill() {
         dollarAvailable++;
         moneyCounterLabel.setText("$" + dollarAvailable);
+    }
+
+    ActionListener imageArrayReload = evt -> {
+        imageURLS = MySQL.getImagesLinks();
+        imageOn = 0;
+    };
+
+    Timer imgReload = new Timer(300000,imageArrayReload); // 300000
+
+    public void nextImgLoad() {
+        System.out.println(imageURLS.get(imageOn)); // Throw it into a JLABEL pulling image for imgur
     }
 
     // This is used to change back to normal screen if password isn't typed in and correct.

@@ -24,6 +24,21 @@ public class MySQL {
         createSalesTable();
         createDataTable();
         createSettingsTable();
+        createImagesTable();
+
+    }
+
+    public static void createImagesTable() {
+        String sqlCreate = "CREATE TABLE IF NOT EXISTS `vendingMachine`.`images` (" +
+                "  `id` INT NOT NULL AUTO_INCREMENT," +
+                "  `images` VARCHAR(255) NOT NULL," +
+                "  PRIMARY KEY (`id`))";
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute(sqlCreate);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void createSettingsTable() {
@@ -80,6 +95,23 @@ public class MySQL {
             throw new RuntimeException(e);
         }
     }
+
+    public static ArrayList<String> getImagesLinks() {
+        String sql = "SELECT * FROM vendingMachine.images";
+        ArrayList<String> newArr = new ArrayList<>();
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next())
+            {
+                newArr.add(rs.getString("images"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return newArr;
+    }
+
 
     public static boolean doesRowExist(String rowStr) {
         String sql = "SELECT machineRows.row FROM vendingMachine.machineRows WHERE machineRows.row = \"" + rowStr + "\"";
