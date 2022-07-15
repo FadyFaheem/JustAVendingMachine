@@ -5,10 +5,15 @@ import com.pyramidacceptors.ptalk.api.event.Events;
 import com.pyramidacceptors.ptalk.api.event.PTalkEvent;
 import com.pyramidacceptors.ptalk.api.event.PTalkEventListener;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -20,7 +25,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateAllItemNumLabel,
             updateItemRowLabel, updateItemNumLabel,
             updateItemNameRowLabel,
-            changeRelayLineRowLabel, changeRelayLineNumLabel, sendTestEmailLabel;
+            changeRelayLineRowLabel, changeRelayLineNumLabel, sendTestEmailLabel,
+            adJLabel;
 
     private JTextField updateItemNameTextField, changeLocationTextField, changeSendingEmailTextField, changeSendingPassTextField, changeReceivingEmailTextField;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
@@ -79,7 +85,10 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         row = MySQL.rowList();
         imageURLS = MySQL.getImagesLinks();
         imgReload.setRepeats(true);
+        loadImageFifteenSecond.setRepeats(true);
         imgReload.start();
+        loadImageFifteenSecond.start();
+        nextImgLoad();
     }
 
     public void appendAdminMenuButtons() {
@@ -188,6 +197,11 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         vendButton = GUI.buttonSetup("Vend", 100, 340, 1270, 660,200,this, true);
         mainWindow.add(vendButton);
 
+
+        // JLABEL AD
+
+        adJLabel = GUI.labelSetup("", 0, 0, 1520, 1080,325,true);
+        mainWindow.add(adJLabel);
 
         // VENDING SCREEN //
 
@@ -525,13 +539,35 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     ActionListener imageArrayReload = evt -> {
         imageURLS = MySQL.getImagesLinks();
         imageOn = 0;
+        nextImgLoad();
     };
 
     Timer imgReload = new Timer(300000,imageArrayReload); // 300000
 
     public void nextImgLoad() {
-        System.out.println(imageURLS.get(imageOn)); // Throw it into a JLABEL pulling image for imgur
+        if (imageOn >=  imageURLS.size()) {
+            imageOn = 0;
+        }
+        if (imageURLS.size() != 0) {
+            try {
+                URL url = new URL(imageURLS.get(imageOn));// Throw it into a JLABEL pulling image for imgur
+                //URL url = new URL("https://i.imgur.com/yU8iBKr.jpeg");// Throw it into a JLABEL pulling image for imgur
+                BufferedImage img = ImageIO.read(url);
+                Image dimg = img.getScaledInstance(adJLabel.getWidth(), adJLabel.getHeight(), Image.SCALE_SMOOTH);
+                adJLabel.setIcon(new ImageIcon(dimg));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        imageOn++;
+
     }
+
+    ActionListener newImageLoad = evt -> {
+        nextImgLoad();
+    };
+
+    Timer loadImageFifteenSecond = new Timer(15000, newImageLoad);
 
     // This is used to change back to normal screen if password isn't typed in and correct.
     ActionListener passwordDelay = evt -> {
