@@ -1,19 +1,13 @@
-String command;
+int Relay = 27;                 // Digital pin D5
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
+  pinMode(Relay, OUTPUT);       // declare Relay as output
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  if (Serial.available()) {
-    command = Serial.readStringUntil('\n');
-    command.trim();
-    Serial.println(command);
-    pinMode(command.toInt(), OUTPUT);
-    digitalWrite(command.toInt(), HIGH);
-    delay(2000);
-    digitalWrite(command.toInt(), LOW);
-  }
+  digitalWrite (Relay, HIGH);
+  delay(500);
+  digitalWrite (Relay, LOW);
+  delay(500);
 }
