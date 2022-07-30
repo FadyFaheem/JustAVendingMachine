@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JustAVendingMachine:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JustAVendingMachine_jar</output-path>
+    <root id="archive" name="JustAVendingMachine.jar">
+      <element id="module-output" name="JustAVendingMachine" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/fadyfaheem/jSerialComm-2.9.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/fadyfaheem/javax.mail.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/fadyfaheem/slf4j-simple-1.7.36.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/fadyfaheem/slf4j-api-1.7.36.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/fadyfaheem/mysql-connector-java-8.0.29.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/com/fadyfaheem/jPyramidRS-232-1.2.7.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

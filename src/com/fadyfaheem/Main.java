@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
+    Container mainWindow;
     private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel,
             adminPasscodeLabel, adminPageLabel,
             changeOfCostRowLabel, changeOfCostPriceLabel,
@@ -79,7 +80,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
     public Main() {
         guiSetup(); // Sets up GUI
-        //BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
+        BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
         ArduinoConnection.connectToArd(); // Creates connection to arduino
         MySQL.mySQLConnect();
         row = MySQL.rowList();
@@ -122,13 +123,13 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         // Main Panel Setup
 
-        Container mainWindow = getContentPane(); //need this to make JFrame work well
+        mainWindow = getContentPane(); //need this to make JFrame work well
         mainWindow.setLayout(null); //do not use any layout managers
         mainWindow.setBackground(Color.decode("#212426")); //make the background of the window dark gray
         setDefaultCloseOperation(EXIT_ON_CLOSE); //actually end the program when clicking the close button
         setTitle("Vending Machine");//text for the window's title bar
         setResizable(true);//don't allow the user to resize the window
-        setSize(1080 / 3,1920 / 3);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
+        setSize(1080,1920);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
 
         // TOP BAR
 

@@ -9,8 +9,8 @@ import java.awt.event.MouseListener;
 public class GUI extends Main {
     static int actualScreenResHeight = 1920; // CONSTANT DO NOT CHANGE
     static int actualScreenResWidth = 1080; // CONSTANT DO NOT CHANGE
-    static int screenHeight = 1920 / 3;
-    static int screenWidth = 1080 / 3;
+    static int screenHeight = 1920;
+    static int screenWidth = 1080;
     public static JButton buttonSetup(String buttonText, int fontSize, int x, int y, int width, int height, ActionListener listener, boolean enabled){
         JButton button = new JButton();
         button.setText(buttonText); // sets Button Text
