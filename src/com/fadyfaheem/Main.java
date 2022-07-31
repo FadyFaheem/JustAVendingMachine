@@ -1,5 +1,6 @@
 package com.fadyfaheem;
 
+import com.fazecast.jSerialComm.SerialPort;
 import com.pyramidacceptors.ptalk.api.event.CreditEvent;
 import com.pyramidacceptors.ptalk.api.event.Events;
 import com.pyramidacceptors.ptalk.api.event.PTalkEvent;
@@ -12,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -77,11 +78,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private boolean letterAdded = false; // bool to check for input
     private String selectionString = "";
 
+    static SerialPort ardAccess;
+
 
     public Main() {
         guiSetup(); // Sets up GUI
         BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
-        ArduinoConnection.connectToArd(); // Creates connection to arduino
+        ardAccess = SerialPort.getCommPort("ttyACM0");
+        ardAccess.setComPortParameters(9600,8,1,0);
+        ardAccess.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+        System.out.println("Open port: " + ardAccess.openPort());
         MySQL.mySQLConnect();
         row = MySQL.rowList();
         imageURLS = MySQL.getImagesLinks();
@@ -90,6 +96,19 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         imgReload.start();
         loadImageFifteenSecond.start();
         nextImgLoad();
+    }
+
+    public static void arduinoWrite(String a){ // Writes to arduino code. Arduino takes number and proceeds to hold relay open for 2sec
+
+        try{
+            Thread.sleep(5);
+            PrintWriter send = new PrintWriter(ardAccess.getOutputStream());
+            send.print(a);
+            send.flush();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public void appendAdminMenuButtons() {
@@ -130,7 +149,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         setTitle("Vending Machine");//text for the window's title bar
         setResizable(true);//don't allow the user to resize the window
         setSize(1080,1920);//set the size of the window to half the screen width and half the screen height//where to position the top left corner of the window
-
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         // TOP BAR
 
         moneyCounterLabel = GUI.labelSetup("$0", 100, 200,75,200,200,true);
@@ -517,7 +537,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             boolean checkRow = MySQL.doesRowExist(selectionString);
             boolean doesRowHaveItems = MySQL.doesRowHaveItems(selectionString);
             if (checkRow && doesRowHaveItems) {
-                selectLabel.setForeground(Color.white);
+                int costOfItem = MySQL.costOfItem(selectionString);
+                if (dollarAvailable >= costOfItem) {
+                    selectLabel.setForeground(Color.white);
+                } else {
+                    selectLabel.setForeground(Color.red);
+                }
             } else {
                 selectLabel.setForeground(Color.red);
             }
@@ -533,8 +558,11 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     }
 
     public void addDollarBill() {
-        dollarAvailable++;
-        moneyCounterLabel.setText("$" + dollarAvailable);
+            dollarAvailable++;
+            moneyCounterLabel.setText("$" + dollarAvailable);
+            if (dollarAvailable == 2) {
+                BillAcceptor.acceptor.pause();
+            }
     }
 
     ActionListener imageArrayReload = evt -> {
@@ -566,6 +594,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
     ActionListener newImageLoad = evt -> {
         nextImgLoad();
+        if (!ardAccess.isOpen()) {
+            ardAccess = SerialPort.getCommPort("ttyACM0");
+        }
     };
 
     Timer loadImageFifteenSecond = new Timer(15000, newImageLoad);
@@ -600,6 +631,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         clearButton.setVisible(isVisible);
         vendButton.setVisible(isVisible);
         adminButton.setVisible(isVisible);
+        adJLabel.setVisible(isVisible);
     }
 
     public void adminLoginVisibility(boolean isVisible) {
@@ -723,6 +755,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ActionListener task = evt -> {
             vendingPendingLabel.setVisible(false);
             mainScreenVisibility(true);
+            BillAcceptor.acceptor.unpause();
         };
         Timer countdown = new Timer(5000 ,task);
         countdown.setRepeats(false);
@@ -915,6 +948,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 if (selectLabel.getForeground() == Color.white) {
                 int costOfItem = MySQL.costOfItem(selectionString);
                     if (dollarAvailable >= costOfItem) {
+                        BillAcceptor.acceptor.pause();
                         dollarAvailable -= costOfItem;
                         moneyCounterLabel.setText("$" + dollarAvailable);
                         MySQL.activateMotorForRow(selectionString);
@@ -1219,13 +1253,12 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         }
 
         if (e.getSource() == changeRelayLineSave) {
-            System.out.println("This happened" + changeRelayLineRowLabel.getText() + changeRelayLineNumLabel.getText());
             MySQL.changeRelayLineNum(changeRelayLineRowLabel.getText(), Integer.parseInt(changeRelayLineNumLabel.getText()));
         }
 
         if (e.getSource() == changeRelayLineTest) {
             changeRelayLineTest.setEnabled(false);
-            ArduinoConnection.arduinoWrite(changeRelayLineNumLabel.getText());
+            arduinoWrite(changeRelayLineNumLabel.getText());
             ActionListener task = evt -> changeRelayLineTest.setEnabled(true);
             Timer countdown = new Timer(5000 ,task);
             countdown.setRepeats(false);

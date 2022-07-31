@@ -274,7 +274,7 @@ public class MySQL {
            String sqlTwo = "INSERT IGNORE INTO `vendingMachine`.`settings` (`name`, `value`) VALUES ('" + settingName + "', '" + value + "')";
             try {
                 Statement stmt = connection.createStatement();
-                stmt.execute(sql);
+                stmt.execute(sqlTwo);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -570,7 +570,7 @@ public class MySQL {
                 relay = rs.getInt("relayLineNum");
             }
 
-            ArduinoConnection.arduinoWrite(relay + "");
+            Main.arduinoWrite(relay + "");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
