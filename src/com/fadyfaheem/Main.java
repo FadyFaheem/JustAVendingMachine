@@ -5,16 +5,14 @@ import com.pyramidacceptors.ptalk.api.event.CreditEvent;
 import com.pyramidacceptors.ptalk.api.event.Events;
 import com.pyramidacceptors.ptalk.api.event.PTalkEvent;
 import com.pyramidacceptors.ptalk.api.event.PTalkEventListener;
+import org.omg.CORBA.SystemException;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 
@@ -27,8 +25,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             updateAllItemNumLabel,
             updateItemRowLabel, updateItemNumLabel,
             updateItemNameRowLabel,
-            changeRelayLineRowLabel, changeRelayLineNumLabel, sendTestEmailLabel,
-            adJLabel;
+            changeRelayLineRowLabel, changeRelayLineNumLabel, sendTestEmailLabel;
 
     private JTextField updateItemNameTextField, changeLocationTextField, changeSendingEmailTextField, changeSendingPassTextField, changeReceivingEmailTextField;
     private JButton aButton, bButton, cButton, dButton, // MAIN SCREEN
@@ -67,9 +64,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     private int relayLineNumInt = 0;
     private int itemNameRowInt = 0;
     private final int maxPageNum = (int) Math.ceil(adminMenuOptions.length / 5.0);
-
-    public ArrayList<String> imageURLS;
-    private int imageOn = 0;
     private final ArrayList<JButton> adminMenuButtons = new ArrayList<>();
 
     private int changeOfCostInt = 0;
@@ -84,18 +78,16 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public Main() {
         guiSetup(); // Sets up GUI
         BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
-        ardAccess = SerialPort.getCommPort("ttyACM0");
-        ardAccess.setComPortParameters(9600,8,1,0);
-        ardAccess.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
-        System.out.println("Open port: " + ardAccess.openPort());
+        ardAccess = SerialPort.getCommPort("/dev/ttyACM_DEVICE1");
+        try {
+            System.out.println(ardAccess.isOpen());
+        } catch (Exception e) {
+            System.out.println("null");
+        }
         MySQL.mySQLConnect();
         row = MySQL.rowList();
-        imageURLS = MySQL.getImagesLinks();
-        imgReload.setRepeats(true);
-        loadImageFifteenSecond.setRepeats(true);
-        imgReload.start();
-        loadImageFifteenSecond.start();
-        nextImgLoad();
+        arduinoCheck.setRepeats(true);
+        arduinoCheck.start();
     }
 
     public static void arduinoWrite(String a){ // Writes to arduino code. Arduino takes number and proceeds to hold relay open for 2sec
@@ -117,25 +109,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         adminMenuButtons.add(adminOptionThree);
         adminMenuButtons.add(adminOptionFour);
         adminMenuButtons.add(adminOptionFive);
-    }
-
-    public static void showOnScreen( int screen, JFrame frame ) // Full Screens automatically to screen
-    {
-        GraphicsEnvironment ge = GraphicsEnvironment
-                .getLocalGraphicsEnvironment();
-        GraphicsDevice[] gs = ge.getScreenDevices();
-        if( screen > -1 && screen < gs.length )
-        {
-            gs[screen].setFullScreenWindow( frame );
-        }
-        else if( gs.length > 0 )
-        {
-            gs[0].setFullScreenWindow( frame );
-        }
-        else
-        {
-            throw new RuntimeException( "No Screens Found" );
-        }
     }
 
     public void guiSetup(){
@@ -217,12 +190,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
         vendButton = GUI.buttonSetup("Vend", 100, 340, 1270, 660,200,this, true);
         mainWindow.add(vendButton);
-
-
-        // JLABEL AD
-
-        adJLabel = GUI.labelSetup("", 0, 0, 1520, 1080,325,true);
-        mainWindow.add(adJLabel);
 
         // VENDING SCREEN //
 
@@ -563,43 +530,35 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
             if (dollarAvailable == 2) {
                 BillAcceptor.acceptor.pause();
             }
-    }
-
-    ActionListener imageArrayReload = evt -> {
-        imageURLS = MySQL.getImagesLinks();
-        imageOn = 0;
-        nextImgLoad();
-    };
-
-    Timer imgReload = new Timer(300000,imageArrayReload); // 300000
-
-    public void nextImgLoad() {
-        if (imageOn >=  imageURLS.size()) {
-            imageOn = 0;
-        }
-        if (imageURLS.size() != 0) {
-            try {
-                URL url = new URL(imageURLS.get(imageOn));// Throw it into a JLABEL pulling image for imgur
-                //URL url = new URL("https://i.imgur.com/yU8iBKr.jpeg");// Throw it into a JLABEL pulling image for imgur
-                BufferedImage img = ImageIO.read(url);
-                Image dimg = img.getScaledInstance(adJLabel.getWidth(), adJLabel.getHeight(), Image.SCALE_SMOOTH);
-                adJLabel.setIcon(new ImageIcon(dimg));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        if (selectionString.length() == 2) {
+            boolean checkRow = MySQL.doesRowExist(selectionString);
+            boolean doesRowHaveItems = MySQL.doesRowHaveItems(selectionString);
+            if (checkRow && doesRowHaveItems) {
+                int costOfItem = MySQL.costOfItem(selectionString);
+                if (dollarAvailable >= costOfItem) {
+                    selectLabel.setForeground(Color.white);
+                } else {
+                    selectLabel.setForeground(Color.red);
+                }
+            } else {
+                selectLabel.setForeground(Color.red);
             }
         }
-        imageOn++;
-
     }
 
-    ActionListener newImageLoad = evt -> {
-        nextImgLoad();
-        if (!ardAccess.isOpen()) {
-            ardAccess = SerialPort.getCommPort("ttyACM0");
+
+
+    ActionListener checkArd = evt -> {
+        try {
+            if (!ardAccess.isOpen()){
+                ardAccess = SerialPort.getCommPort("/dev/ttyACM_DEVICE1");
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to reconnect after fail.");
         }
     };
 
-    Timer loadImageFifteenSecond = new Timer(15000, newImageLoad);
+    Timer arduinoCheck = new Timer(15000, checkArd);
 
     // This is used to change back to normal screen if password isn't typed in and correct.
     ActionListener passwordDelay = evt -> {
@@ -631,7 +590,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         clearButton.setVisible(isVisible);
         vendButton.setVisible(isVisible);
         adminButton.setVisible(isVisible);
-        adJLabel.setVisible(isVisible);
     }
 
     public void adminLoginVisibility(boolean isVisible) {
