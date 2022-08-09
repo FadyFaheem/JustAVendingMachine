@@ -79,11 +79,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         guiSetup(); // Sets up GUI
         BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
         ardAccess = SerialPort.getCommPort("/dev/ttyACM_DEVICE1");
-        try {
-            System.out.println(ardAccess.isOpen());
-        } catch (Exception e) {
-            System.out.println("null");
-        }
+        System.out.println("Open port: " + ardAccess.openPort());
         MySQL.mySQLConnect();
         row = MySQL.rowList();
         arduinoCheck.setRepeats(true);
@@ -554,8 +550,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 ardAccess = SerialPort.getCommPort("/dev/ttyACM_DEVICE1");
             }
         } catch (Exception e) {
-            System.out.println("Failed to reconnect after fail.");
+            e.printStackTrace();
         }
+
     };
 
     Timer arduinoCheck = new Timer(15000, checkArd);

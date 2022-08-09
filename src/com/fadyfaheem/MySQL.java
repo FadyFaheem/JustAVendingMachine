@@ -10,7 +10,7 @@ public class MySQL {
     static Connection connection;
 
     public static void mySQLConnect() {
-        String url = "jdbc:mysql://localhost:3306/vendingMachine";
+        String url = "jdbc:mysql://localhost:3306/vendingMachine/confluence?autoReconnect=true";
         String username = "vending";
         String password = "dWPZVB4o8WUzg1";
         try {
