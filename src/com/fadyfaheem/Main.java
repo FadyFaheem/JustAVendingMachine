@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 
@@ -552,10 +553,9 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     };
 
-    Timer arduinoCheck = new Timer(15000, checkArd);
+    Timer arduinoCheck = new Timer(10000, checkArd);
 
     // This is used to change back to normal screen if password isn't typed in and correct.
     ActionListener passwordDelay = evt -> {

@@ -10,12 +10,19 @@ public class MySQL {
     static Connection connection;
 
     public static void mySQLConnect() {
-        String url = "jdbc:mysql://localhost:3306/vendingMachine/confluence?autoReconnect=true";
+        String url = "jdbc:mysql://localhost:3306/vendingMachine?autoReconnect=true";
         String username = "vending";
         String password = "dWPZVB4o8WUzg1";
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(url, username, password);
+            String sql = "SET SESSION wait_timeout=201600";
+            try {
+                Statement stmt = connection.createStatement();
+                stmt.execute(sql);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot connect the database!", e);
         } catch (ClassNotFoundException e) {
@@ -151,7 +158,9 @@ public class MySQL {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                itemsMissing.add(rs.getString("nameOfItemSold"));
+                if (!rs.getString("nameOfItemSold").equals("No Item")) {
+                    itemsMissing.add(rs.getString("nameOfItemSold"));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
