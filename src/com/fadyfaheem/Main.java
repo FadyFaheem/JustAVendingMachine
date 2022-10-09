@@ -7,6 +7,8 @@ import com.pyramidacceptors.ptalk.api.event.PTalkEvent;
 import com.pyramidacceptors.ptalk.api.event.PTalkEventListener;
 import org.omg.CORBA.SystemException;
 
+import javax.mail.MessagingException;
+import javax.mail.Transport;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,9 +17,11 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
-public class Main extends JFrame implements PTalkEventListener, ActionListener {
+public class Main extends JFrame implements ActionListener {
 
     Container mainWindow;
     private JLabel moneyCounterLabel, selectLabel, vendingPendingLabel,
@@ -78,13 +82,43 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
 
     public Main() {
         guiSetup(); // Sets up GUI
-        BillAcceptor.connect(this); // Initiates bill acceptor // Disabled when not in use
         ardAccess = SerialPort.getCommPort("/dev/ttyACM_DEVICE1");
         System.out.println("Open port: " + ardAccess.openPort());
         MySQL.mySQLConnect();
         row = MySQL.rowList();
+        //row = new ArrayList<>();
         arduinoCheck.setRepeats(true);
         arduinoCheck.start();
+
+
+        ExecutorService billAcceptorWatcher = Executors.newCachedThreadPool();
+
+        billAcceptorWatcher.execute(() -> {
+            System.out.println("List COM ports");
+            SerialPort comPortsTWO = SerialPort.getCommPort("/dev/ttyACM_DEVICE2");
+            comPortsTWO.openPort();
+            comPortsTWO.setBaudRate(9600);
+
+            try {
+                while (true)
+                {
+                    // read serial port  and display data
+                    while (comPortsTWO.bytesAvailable() > 0)
+                    {
+                        byte[] readBuffer = new byte[comPortsTWO.bytesAvailable()];
+                        int numRead = comPortsTWO.readBytes(readBuffer, readBuffer.length);
+                        for (int i = 0; i < readBuffer.length; i++) {
+                            if ((char)readBuffer[i] == '1') {
+                                addDollarBill();
+                            }
+                        }
+
+
+
+                    }
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        });
     }
 
     public static void arduinoWrite(String a){ // Writes to arduino code. Arduino takes number and proceeds to hold relay open for 2sec
@@ -524,9 +558,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public void addDollarBill() {
             dollarAvailable++;
             moneyCounterLabel.setText("$" + dollarAvailable);
-            if (dollarAvailable == 2) {
-                BillAcceptor.acceptor.pause();
-            }
         if (selectionString.length() == 2) {
             boolean checkRow = MySQL.doesRowExist(selectionString);
             boolean doesRowHaveItems = MySQL.doesRowHaveItems(selectionString);
@@ -710,20 +741,10 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         ActionListener task = evt -> {
             vendingPendingLabel.setVisible(false);
             mainScreenVisibility(true);
-            BillAcceptor.acceptor.unpause();
         };
         Timer countdown = new Timer(5000 ,task);
         countdown.setRepeats(false);
         countdown.start();
-    }
-
-    @Override
-    public void changeEventReceived(PTalkEvent evt) {
-        if (evt.getId() == Events.Credit){
-            if (((CreditEvent) evt).getBillName().name().equals("Bill1")) {
-                addDollarBill();
-            }
-        }
     }
 
     public void adminPassCodeLabelSet() {
@@ -845,6 +866,8 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
     public static void main(String[] args) {
         Main bob = new Main();
         bob.setVisible(true);
+
+
     }
 
 
@@ -903,7 +926,6 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
                 if (selectLabel.getForeground() == Color.white) {
                 int costOfItem = MySQL.costOfItem(selectionString);
                     if (dollarAvailable >= costOfItem) {
-                        BillAcceptor.acceptor.pause();
                         dollarAvailable -= costOfItem;
                         moneyCounterLabel.setText("$" + dollarAvailable);
                         MySQL.activateMotorForRow(selectionString);
@@ -925,7 +947,7 @@ public class Main extends JFrame implements PTalkEventListener, ActionListener {
         // ADMIN LOGIN PAGE WITH BUTTON ON MAIN MENU
 
         if (e.getSource() == adminButton) {
-            if (selectionString.equals("A6")) {
+            if (selectionString.equals("A7")) {
                 adminSwitch++;
                 if (adminSwitch == 5) {
                     adminSwitch = 0;

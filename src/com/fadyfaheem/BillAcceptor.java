@@ -10,7 +10,7 @@ public class BillAcceptor {
 
     public static void connect(com.pyramidacceptors.ptalk.api.event.PTalkEventListener listener) {
         try {
-            acceptor = PyramidAcceptor.valueOfRS232("/dev/ttyUSB0");
+            acceptor = PyramidAcceptor.valueOfRS232("/dev/ttyUSB_DEVICE1");
             acceptor.connect();
             acceptor.addChangeListener(listener);
         } catch (PyramidDeviceException e) {

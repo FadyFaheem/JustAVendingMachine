@@ -31,7 +31,7 @@ public class MySQL {
         createSalesTable();
         createDataTable();
         createSettingsTable();
-        createImagesTable();
+        //createImagesTable();
 
     }
 
